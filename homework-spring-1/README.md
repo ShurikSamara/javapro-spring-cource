@@ -4,24 +4,24 @@
 * [Пример результатов](#пример-результатов)
 
 ## Части задания
-[X] Развернуть локально postgresql БД, создать таблицу users (id bigserial primary key, username varchar(255) unique);
+- [X] Развернуть локально postgresql БД, создать таблицу users (id bigserial primary key, username varchar(255) unique);
 
-[X]Создать Maven проект и подключить к нему: драйвер postgresql, hickaricp, spring context.
+- [X] Создать Maven проект и подключить к нему: драйвер postgresql, hickaricp, spring context.
 
-[ ] Создать пул соединений в виде Spring бина
+- [X] Создать пул соединений в виде Spring бина
 
-[X] Создать класс User (Long id, String username)
+- [X] Создать класс User (Long id, String username)
 
-[X] Реализовать в виде бина класс UserDao, который позволит выполнять CRUD операции над пользователями
+- [X] Реализовать в виде бина класс UserDao, который позволит выполнять CRUD операции над пользователями
 
-[X] Реализовать в виде бина UserService, который позволяет: 
+- [X] Реализовать в виде бина UserService, который позволяет: 
 
     - создавать,
     - удалять,
     - получать одного,
     - получать всех пользователей из базы данных
 
-[X] Создать Spring Context, получить из него бин UserService и выполнить все перечисленные операции
+- [X] Создать Spring Context, получить из него бин UserService и выполнить все перечисленные операции
 
 ## Пример результатов
 
