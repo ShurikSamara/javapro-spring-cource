@@ -1,16 +1,17 @@
 package ru.learning.java.spring;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.learning.java.spring.config.AppConfig;
+import org.springframework.context.annotation.ComponentScan;
 import ru.learning.java.spring.model.User;
 import ru.learning.java.spring.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
 
+@ComponentScan
 public class Application {
   public static void main(String[] args) {
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
 
     UserService userService = context.getBean(UserService.class);
 
