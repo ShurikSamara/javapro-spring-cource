@@ -21,6 +21,9 @@ public class UserService {
   }
 
   public User createUser(String username) {
+    if (userRepository.findByUsername(username).isPresent()) {
+      throw new RuntimeException("Пользователь с таким именем уже существует: " + username);
+    }
     User user = new User(username);
     return userRepository.save(user);
   }
@@ -35,20 +38,45 @@ public class UserService {
     return userRepository.findAll();
   }
 
+  @Transactional
   public User updateUser(Long id, String newUsername) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID пользователя не может быть null");
+    }
+    if (newUsername == null || newUsername.trim().isEmpty()) {
+      throw new IllegalArgumentException("Имя пользователя не может быть пустым");
+    }
+
+    Optional<User> existingUser = userRepository.findByUsername(newUsername.trim());
+    if (existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
+      throw new RuntimeException("Пользователь с именем '" + newUsername + "' уже существует");
+    }
+
     User user = userRepository.findById(id)
       .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + id));
-    user.setUsername(newUsername);
+
+    user.setUsername(newUsername.trim());
     return userRepository.save(user);
   }
 
   public boolean deleteUser(Long id) {
-    if (userRepository.existsById(id)) {
-      userRepository.deleteById(id);
-      return true;
+    if (id == null) {
+      return false;
     }
-    return false;
+
+    try {
+      Optional<User> user = userRepository.findById(id);
+      if (user.isPresent()) {
+        userRepository.delete(user.get());
+        return true;
+      }
+      return false;
+    } catch (Exception e) {
+      System.err.println("Ошибка при удалении пользователя с ID " + id + ": " + e.getMessage());
+      return false;
+    }
   }
+
 
   @Transactional(readOnly = true)
   public Optional<User> findByUsername(String username) {
