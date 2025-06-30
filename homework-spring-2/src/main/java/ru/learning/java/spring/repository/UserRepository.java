@@ -16,7 +16,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query("SELECT u FROM User u WHERE u.username LIKE %:pattern%")
   List<User> findByUsernameContaining(@Param("pattern") String pattern);
-
-  @Query("SELECT COUNT(u) FROM User u")
-  long countAllUsers();
 }

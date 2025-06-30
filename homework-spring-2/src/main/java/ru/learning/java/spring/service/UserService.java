@@ -90,6 +90,6 @@ public class UserService {
 
   @Transactional(readOnly = true)
   public long getUserCount() {
-    return userRepository.countAllUsers();
+    return userRepository.count();
   }
 }
