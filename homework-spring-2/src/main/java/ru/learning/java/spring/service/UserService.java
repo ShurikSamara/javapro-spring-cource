@@ -21,6 +21,9 @@ public class UserService {
   }
 
   public User createUser(String username) {
+    if (username == null || username.trim().isEmpty()) {
+      throw new IllegalArgumentException("Имя пользователя не может быть пустым");
+    }
     if (userRepository.findByUsername(username).isPresent()) {
       throw new RuntimeException("Пользователь с таким именем уже существует: " + username);
     }
