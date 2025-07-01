@@ -28,9 +28,9 @@ public class UserService {
     username = username.trim();
 
     try {
-        User user = new User(username);
-        return userRepository.save(user);
-      } catch (DataIntegrityViolationException e) {
+      User user = new User(username);
+      return userRepository.save(user);
+    } catch (DataIntegrityViolationException e) {
       throw new RuntimeException("Пользователь с таким именем уже существует: " + username);
     }
   }
@@ -72,9 +72,8 @@ public class UserService {
     }
 
     try {
-      Optional<User> user = userRepository.findById(id);
-      if (user.isPresent()) {
-        userRepository.delete(user.get());
+      if (userRepository.existsById(id)) {
+        userRepository.deleteById(id);
         return true;
       }
       return false;
