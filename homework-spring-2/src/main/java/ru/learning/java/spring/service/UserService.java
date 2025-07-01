@@ -1,6 +1,7 @@
 package ru.learning.java.spring.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.learning.java.spring.model.User;
@@ -24,11 +25,14 @@ public class UserService {
     if (username == null || username.trim().isEmpty()) {
       throw new IllegalArgumentException("Имя пользователя не может быть пустым");
     }
-    if (userRepository.findByUsername(username).isPresent()) {
+    username = username.trim();
+
+    try {
+        User user = new User(username);
+        return userRepository.save(user);
+      } catch (DataIntegrityViolationException e) {
       throw new RuntimeException("Пользователь с таким именем уже существует: " + username);
     }
-    User user = new User(username);
-    return userRepository.save(user);
   }
 
   @Transactional(readOnly = true)
