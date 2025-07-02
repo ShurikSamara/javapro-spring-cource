@@ -26,13 +26,9 @@ public class ApplicationRunner implements CommandLineRunner {
 
     // 1. Создание пользователей
     System.out.println("1. Создание пользователей:");
-    User user1 = userService.createUser("john_doe");
-    User user2 = userService.createUser("jane_smith");
-    User user3 = userService.createUser("admin");
+    User user = userService.createUser("jane_smith");
 
-    System.out.println("Создан: " + user1);
-    System.out.println("Создан: " + user2);
-    System.out.println("Создан: " + user3);
+    System.out.println("Создан: " + user);
     System.out.println();
 
     // 2. Получение всех пользователей
@@ -43,13 +39,13 @@ public class ApplicationRunner implements CommandLineRunner {
 
     // 3. Получение пользователя по ID
     System.out.println("3. Получение пользователя по ID:");
-    Optional<User> foundUser = userService.getUserById(user1.getId());
-    foundUser.ifPresent(user -> System.out.println("Найден пользователь: " + user));
+    Optional<User> foundUser = userService.getUserById(user.getId());
+    foundUser.ifPresent(_user -> System.out.println("Найден пользователь: " + _user));
     System.out.println();
 
     // 4. Обновление пользователя
     System.out.println("4. Обновление пользователя:");
-    User updatedUser = userService.updateUser(user2.getId(), "jane_doe_updated");
+    User updatedUser = userService.updateUser(user.getId(), "jane_smith_updated");
     System.out.println("Обновлен пользователь: " + updatedUser);
     System.out.println();
 
@@ -61,14 +57,14 @@ public class ApplicationRunner implements CommandLineRunner {
 
     // 6. Удаление пользователя
     System.out.println("6. Удаление пользователя:");
-    boolean deleted = userService.deleteUser(user3.getId());
+    boolean deleted = userService.deleteUser(updatedUser.getId());
     System.out.println("Пользователь удален: " + deleted);
     System.out.println();
-
-    // 7. Все пользователи после удаления
-    System.out.println("7. Все пользователи после удаления:");
-    allUsers = userService.getAllUsers();
-    allUsers.forEach(System.out::println);
+//
+//    // 7. Все пользователи после удаления
+//    System.out.println("7. Все пользователи после удаления:");
+//    allUsers = userService.getAllUsers();
+//    allUsers.forEach(System.out::println);
 
     System.out.println("=== Завершение демонстрация работы с пользователями ===");
   }
