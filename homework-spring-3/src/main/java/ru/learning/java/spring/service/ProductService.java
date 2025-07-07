@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.repository.ProductRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +12,21 @@ import java.util.Optional;
 public class ProductService {
 
   private final ProductRepository productRepository;
+
+  private void checkProduct(Product product) {
+    if (product.getAccountNumber() == null || product.getAccountNumber().trim().isEmpty()) {
+      throw new IllegalArgumentException("Номер счета не может быть пустым");
+    }
+    if (product.getBalance() == null) {
+      throw new IllegalArgumentException("Баланс не может быть null");
+    }
+    if (product.getProductType() == null) {
+      throw new IllegalArgumentException("Тип продукта не может быть null");
+    }
+    if (product.getUserId() == null) {
+      throw new IllegalArgumentException("ID пользователя не может быть null");
+    }
+  }
 
   @Autowired
   public ProductService(ProductRepository productRepository) {
@@ -23,32 +37,23 @@ public class ProductService {
     if (product == null) {
       throw new IllegalArgumentException("Продукт не может быть null");
     }
-    if (product.getAccountNumber() == null || product.getAccountNumber().trim().isEmpty()) {
-      throw new IllegalArgumentException("Номер счета не может быть пустым");
-    }
-    if ((product.getBalance() == null) || (product.getBalance().compareTo(BigDecimal.ZERO) < 0)) {
-      throw new IllegalArgumentException("Баланс не может быть отрицательным");
-    }
-    if (product.getProductType() == null) {
-      throw new IllegalArgumentException("Тип продукта должен быть указан");
-    }
-    if (product.getUserId() == null || product.getUserId() <= 0) {
-      throw new IllegalArgumentException("ID пользователя должен быть положительным числом");
-    }
+    checkProduct(product);
 
+    // Убеждаемся, что ID не установлен для нового продукта
+    product.setId(null);
     return productRepository.save(product);
   }
 
   public Optional<Product> getProductById(Long id) {
-    if (id == null || id <= 0) {
-      throw new IllegalArgumentException("ID должен быть положительным числом");
+    if (id == null) {
+      throw new IllegalArgumentException("ID продукта не может быть null");
     }
     return productRepository.findById(id);
   }
 
   public List<Product> getProductsByUserId(Long userId) {
-    if (userId == null || userId <= 0) {
-      throw new IllegalArgumentException("ID пользователя должен быть положительным числом");
+    if (userId == null) {
+      throw new IllegalArgumentException("ID пользователя не может быть null");
     }
     return productRepository.findByUserId(userId);
   }
@@ -57,23 +62,38 @@ public class ProductService {
     return productRepository.findAll();
   }
 
-  public Product updateProduct(Product product) {
-    if (product == null || product.getId() == null) {
-      throw new IllegalArgumentException("Продукт и его ID не могут быть null");
+  public Product updateProduct(Long id, Product product) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID продукта не может быть null");
     }
-    if (!productRepository.existsById(product.getId())) {
-      throw new IllegalArgumentException("Продукт с ID " + product.getId() + " не найден");
+    if (product == null) {
+      throw new IllegalArgumentException("Продукт не может быть null");
     }
+
+    // Проверяем, существует ли продукт
+    Optional<Product> existingProduct = productRepository.findById(id);
+    if (existingProduct.isEmpty()) {
+      throw new IllegalArgumentException("Продукт с ID " + id + " не найден");
+    }
+
+    // Валидация данных
+    checkProduct(product);
+
+    // Устанавливаем ID из параметра
+    product.setId(id);
+
     return productRepository.save(product);
   }
 
-  public void deleteProduct(Long id) {
-    if (id == null || id <= 0) {
-      throw new IllegalArgumentException("ID должен быть положительным числом");
+  public boolean deleteProduct(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID продукта не может быть null");
     }
-    if (!productRepository.existsById(id)) {
-      throw new IllegalArgumentException("Продукт с ID " + id + " не найден");
+
+    if (productRepository.existsById(id)) {
+      productRepository.deleteById(id);
+      return true;
     }
-    productRepository.deleteById(id);
+    return false;
   }
 }

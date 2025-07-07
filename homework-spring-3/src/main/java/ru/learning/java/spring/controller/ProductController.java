@@ -61,8 +61,7 @@ public class ProductController {
   @PutMapping("/{id}")
   public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
     try {
-      product.setId(id);
-      Product updatedProduct = productService.updateProduct(product);
+      Product updatedProduct = productService.updateProduct(id, product);
       return ResponseEntity.ok(updatedProduct);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().build();
@@ -71,11 +70,11 @@ public class ProductController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
-    try {
-      productService.deleteProduct(id);
+    boolean deleted = productService.deleteProduct(id);
+    if (deleted) {
       return ResponseEntity.noContent().build();
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
+    } else {
+      return ResponseEntity.notFound().build();
     }
   }
 }

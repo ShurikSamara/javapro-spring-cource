@@ -1,9 +1,11 @@
+
 package ru.learning.java.spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.learning.java.spring.dto.UserRequest;
 import ru.learning.java.spring.model.User;
 import ru.learning.java.spring.service.UserService;
 
@@ -22,7 +24,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<User> getUserById(@PathVariable Long id) {
+  public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
     try {
       Optional<User> user = userService.getUserById(id);
       return user.map(ResponseEntity::ok)
@@ -39,9 +41,9 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<User> createUser(@RequestParam("username") String username) {
+  public ResponseEntity<User> createUser(@RequestBody UserRequest userRequest) {
     try {
-      User createdUser = userService.createUser(username);
+      User createdUser = userService.createUser(userRequest.getUsername());
       return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().build();
@@ -49,9 +51,9 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestParam String username) {
+  public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody UserRequest userRequest) {
     try {
-      User updatedUser = userService.updateUser(id, username);
+      User updatedUser = userService.updateUser(id, userRequest.getUsername());
       return ResponseEntity.ok(updatedUser);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().build();
@@ -59,7 +61,7 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
     boolean deleted = userService.deleteUser(id);
     if (deleted) {
       return ResponseEntity.noContent().build();
