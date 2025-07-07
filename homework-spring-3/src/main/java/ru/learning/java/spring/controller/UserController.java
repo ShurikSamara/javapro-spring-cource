@@ -1,4 +1,3 @@
-
 package ru.learning.java.spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +71,13 @@ public class UserController {
 
   @GetMapping("/search")
   public ResponseEntity<User> findByUsername(@RequestParam String username) {
-    Optional<User> user = userService.findByUsername(username);
-    return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    try {
+      Optional<User> user = userService.findByUsername(username);
+      return user.map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @GetMapping("/search/containing")
