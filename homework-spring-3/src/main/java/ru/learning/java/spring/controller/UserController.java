@@ -39,7 +39,7 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<User> createUser(@RequestParam String username) {
+  public ResponseEntity<User> createUser(@RequestParam("username") String username) {
     try {
       User createdUser = userService.createUser(username);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);

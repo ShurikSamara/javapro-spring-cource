@@ -1,7 +1,6 @@
 package ru.learning.java.spring.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -12,9 +11,6 @@ public class User {
 
   @Column(unique = true, nullable = false)
   private String username;
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private List<Product> products;
 
   public User() {}
 
@@ -41,14 +37,6 @@ public class User {
 
   public void setUsername(String username) {
     this.username = username;
-  }
-
-  public List<Product> getProducts() {
-    return products;
-  }
-
-  public void setProducts(List<Product> products) {
-    this.products = products;
   }
 
   @Override

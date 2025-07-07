@@ -24,10 +24,6 @@ public class Product {
   @Column(name = "user_id", nullable = false)
   private Long userId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", insertable = false, updatable = false)
-  private User user;
-
   public Product() {}
 
   public Product(String accountNumber, BigDecimal balance, ProductType productType, Long userId) {
@@ -83,14 +79,6 @@ public class Product {
 
   public void setUserId(Long userId) {
     this.userId = userId;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
   }
 
   @Override
