@@ -1,22 +1,43 @@
 package ru.learning.java.spring.model;
 
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "products")
 public class Product {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Column(name = "account_number", nullable = false)
   private String accountNumber;
-  private Double balance;
+
+  @Column(nullable = false)
+  private BigDecimal balance;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "product_type", nullable = false)
   private ProductType productType;
+
+  @Column(name = "user_id", nullable = false)
   private Long userId;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", insertable = false, updatable = false)
+  private User user;
 
   public Product() {}
 
-  public Product(String accountNumber, Double balance, ProductType productType, Long userId) {
+  public Product(String accountNumber, BigDecimal balance, ProductType productType, Long userId) {
     this.accountNumber = accountNumber;
     this.balance = balance;
     this.productType = productType;
     this.userId = userId;
   }
 
-  public Product(Long id, String accountNumber, Double balance, ProductType productType, Long userId) {
+  public Product(Long id, String accountNumber, BigDecimal balance, ProductType productType, Long userId) {
     this.id = id;
     this.accountNumber = accountNumber;
     this.balance = balance;
@@ -40,11 +61,11 @@ public class Product {
     this.accountNumber = accountNumber;
   }
 
-  public Double getBalance() {
+  public BigDecimal getBalance() {
     return balance;
   }
 
-  public void setBalance(Double balance) {
+  public void setBalance(BigDecimal balance) {
     this.balance = balance;
   }
 
@@ -62,6 +83,14 @@ public class Product {
 
   public void setUserId(Long userId) {
     this.userId = userId;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
   }
 
   @Override
