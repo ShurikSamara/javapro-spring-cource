@@ -1,5 +1,7 @@
 package ru.learning.java.spring.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
+
+  private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
   private final UserService userService;
 
@@ -61,12 +65,24 @@ public class UserController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-    boolean deleted = userService.deleteUser(id);
-    if (deleted) {
-      return ResponseEntity.noContent().build();
-    } else {
-      return ResponseEntity.notFound().build();
+    try {
+      boolean deleted = userService.deleteUser(id);
+      if (deleted) {
+        return ResponseEntity.noContent().build();
+      } else {
+        return ResponseEntity.notFound().build();
+      }
+    } catch (IllegalArgumentException e) {
+      logger.warn("Неверный запрос при удалении пользователя: {}", e.getMessage());
+      return ResponseEntity.badRequest().build();
+    } catch (IllegalStateException e) {
+      logger.warn("Конфликт при удалении пользователя: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } catch (RuntimeException e) {
+      logger.error("Внутренняя ошибка при удалении пользователя с ID {}: {}", id, e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+
   }
 
   @GetMapping("/search")

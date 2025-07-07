@@ -1,6 +1,9 @@
 package ru.learning.java.spring.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +16,8 @@ import java.util.Optional;
 @Service
 @Transactional
 public class UserService {
+
+  private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
   private final UserRepository userRepository;
 
@@ -68,18 +73,26 @@ public class UserService {
 
   public boolean deleteUser(Long id) {
     if (id == null) {
-      return false;
+      throw new IllegalArgumentException("ID пользователя не может быть null");
     }
 
     try {
-      if (userRepository.existsById(id)) {
-        userRepository.deleteById(id);
-        return true;
+      if (!userRepository.existsById(id)) {
+        logger.debug("Попытка удалить несуществующего пользователя с ID: {}", id);
+        return false;
       }
-      return false;
-    } catch (Exception e) {
-      System.err.println("Ошибка при удалении пользователя с ID " + id + ": " + e.getMessage());
-      return false;
+
+      userRepository.deleteById(id);
+      logger.info("Пользователь с ID {} успешно удален", id);
+      return true;
+
+    } catch (DataIntegrityViolationException e) {
+      logger.error("Не удалось удалить пользователя с ID {} из-за нарушения ограничений БД: {}", id, e.getMessage());
+      throw new IllegalStateException("Невозможно удалить пользователя: на него ссылаются другие данные", e);
+
+    } catch (DataAccessException e) {
+      logger.error("Ошибка доступа к базе данных при удалении пользователя с ID {}: {}", id, e.getMessage());
+      throw new RuntimeException("Ошибка базы данных при удалении пользователя", e);
     }
   }
 
