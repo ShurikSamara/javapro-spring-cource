@@ -69,9 +69,9 @@ public class UserController {
   }
 
   @GetMapping("/search")
-  public ResponseEntity<Optional<User>> findByUsername(@RequestParam String username) {
+  public ResponseEntity<User> findByUsername(@RequestParam String username) {
     Optional<User> user = userService.findByUsername(username);
-    return ResponseEntity.ok(user);
+    return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   @GetMapping("/search/containing")
