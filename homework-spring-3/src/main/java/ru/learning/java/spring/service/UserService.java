@@ -7,6 +7,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.learning.java.spring.exception.UserAlreadyExistsException;
+import ru.learning.java.spring.exception.UserConstraintViolationException;
+import ru.learning.java.spring.exception.UserNotFoundException;
 import ru.learning.java.spring.model.User;
 import ru.learning.java.spring.repository.UserRepository;
 
@@ -36,12 +39,15 @@ public class UserService {
       User user = new User(username);
       return userRepository.save(user);
     } catch (DataIntegrityViolationException e) {
-      throw new RuntimeException("Пользователь с таким именем уже существует: " + username);
+      throw new UserAlreadyExistsException(username);
     }
   }
 
   @Transactional(readOnly = true)
   public Optional<User> getUserById(Long id) {
+    if (id == null || id <= 0) {
+      throw new IllegalArgumentException("ID должен быть положительным числом");
+    }
     return userRepository.findById(id);
   }
 
@@ -52,28 +58,31 @@ public class UserService {
 
   @Transactional
   public User updateUser(Long id, String newUsername) {
-    if (id == null) {
-      throw new IllegalArgumentException("ID пользователя не может быть null");
+    if (id == null || id <= 0) {
+      throw new IllegalArgumentException("ID должен быть положительным числом");
     }
     if (newUsername == null || newUsername.trim().isEmpty()) {
       throw new IllegalArgumentException("Имя пользователя не может быть пустым");
     }
 
-    Optional<User> existingUser = userRepository.findByUsername(newUsername.trim());
-    if (existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
-      throw new RuntimeException("Пользователь с именем '" + newUsername + "' уже существует");
+    newUsername = newUsername.trim();
+
+    // Проверяем, существует ли пользователь
+    User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+    // Проверяем, не занято ли имя другим пользователем
+    Optional<User> userWithSameName = userRepository.findByUsername(newUsername);
+    if (userWithSameName.isPresent() && !userWithSameName.get().getId().equals(id)) {
+      throw new UserAlreadyExistsException(newUsername);
     }
 
-    User user = userRepository.findById(id)
-      .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + id));
-
-    user.setUsername(newUsername.trim());
-    return userRepository.save(user);
+    existingUser.setUsername(newUsername);
+    return userRepository.save(existingUser);
   }
 
   public boolean deleteUser(Long id) {
-    if (id == null) {
-      throw new IllegalArgumentException("ID пользователя не может быть null");
+    if (id == null || id <= 0) {
+      throw new IllegalArgumentException("ID должен быть положительным числом");
     }
 
     try {
@@ -88,7 +97,7 @@ public class UserService {
 
     } catch (DataIntegrityViolationException e) {
       logger.error("Не удалось удалить пользователя с ID {} из-за нарушения ограничений БД: {}", id, e.getMessage());
-      throw new IllegalStateException("Невозможно удалить пользователя: на него ссылаются другие данные", e);
+      throw new UserConstraintViolationException("Невозможно удалить пользователя: на него ссылаются другие данные", e);
 
     } catch (DataAccessException e) {
       logger.error("Ошибка доступа к базе данных при удалении пользователя с ID {}: {}", id, e.getMessage());
@@ -96,14 +105,19 @@ public class UserService {
     }
   }
 
-
   @Transactional(readOnly = true)
   public Optional<User> findByUsername(String username) {
-    return userRepository.findByUsername(username);
+    if (username == null || username.trim().isEmpty()) {
+      throw new IllegalArgumentException("Имя пользователя не может быть пустым");
+    }
+    return userRepository.findByUsername(username.trim());
   }
 
   @Transactional(readOnly = true)
   public List<User> findUsersContaining(String pattern) {
+    if (pattern == null) {
+      throw new IllegalArgumentException("Шаблон поиска не может быть null");
+    }
     return userRepository.findByUsernameContaining(pattern);
   }
 

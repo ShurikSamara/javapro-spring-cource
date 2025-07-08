@@ -2,6 +2,7 @@ package ru.learning.java.spring.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.learning.java.spring.exception.ResourceNotFoundException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.repository.ProductRepository;
 
@@ -12,6 +13,11 @@ import java.util.Optional;
 public class ProductService {
 
   private final ProductRepository productRepository;
+
+  @Autowired
+  public ProductService(ProductRepository productRepository) {
+    this.productRepository = productRepository;
+  }
 
   private void checkProduct(Product product) {
     if (product.getAccountNumber() == null || product.getAccountNumber().trim().isEmpty()) {
@@ -26,11 +32,6 @@ public class ProductService {
     if (product.getUserId() == null) {
       throw new IllegalArgumentException("ID пользователя не может быть null");
     }
-  }
-
-  @Autowired
-  public ProductService(ProductRepository productRepository) {
-    this.productRepository = productRepository;
   }
 
   public Product createProduct(Product product) {
@@ -71,10 +72,7 @@ public class ProductService {
     }
 
     // Проверяем, существует ли продукт
-    Optional<Product> existingProduct = productRepository.findById(id);
-    if (existingProduct.isEmpty()) {
-      throw new IllegalArgumentException("Продукт с ID " + id + " не найден");
-    }
+    productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Продукт с ID " + id + " не найден"));
 
     // Валидация данных
     checkProduct(product);

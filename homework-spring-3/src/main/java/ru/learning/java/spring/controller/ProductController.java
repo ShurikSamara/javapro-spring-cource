@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.learning.java.spring.exception.ResourceNotFoundException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.service.ProductService;
 
@@ -30,23 +31,15 @@ public class ProductController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
-    try {
-      Optional<Product> product = productService.getProductById(id);
-      return product.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    Optional<Product> product = productService.getProductById(id);
+    return product.map(ResponseEntity::ok)
+      .orElseThrow(() -> new ResourceNotFoundException("Продукт с ID " + id + " не найден"));
   }
 
   @GetMapping("/user/{userId}")
   public ResponseEntity<List<Product>> getProductsByUserId(@PathVariable("userId") Long userId) {
-    try {
-      List<Product> products = productService.getProductsByUserId(userId);
-      return ResponseEntity.ok(products);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    List<Product> products = productService.getProductsByUserId(userId);
+    return ResponseEntity.ok(products);
   }
 
   @GetMapping
@@ -57,26 +50,18 @@ public class ProductController {
 
   @PostMapping
   public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-    try {
-      Product createdProduct = productService.createProduct(product);
-      return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    Product createdProduct = productService.createProduct(product);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
-    try {
-      if (product.getId() != null && !product.getId().equals(id)) {
-        return ResponseEntity.badRequest().build();
-      }
-      product.setId(id);
-      Product updatedProduct = productService.updateProduct(id, product);
-      return ResponseEntity.ok(updatedProduct);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
+    if (product.getId() != null && !product.getId().equals(id)) {
+      throw new IllegalArgumentException("ID в пути и в теле запроса не совпадают");
     }
+    product.setId(id);
+    Product updatedProduct = productService.updateProduct(id, product);
+    return ResponseEntity.ok(updatedProduct);
   }
 
   @DeleteMapping("/{id}")
@@ -85,7 +70,7 @@ public class ProductController {
     if (deleted) {
       return ResponseEntity.noContent().build();
     } else {
-      return ResponseEntity.notFound().build();
+      throw new ResourceNotFoundException("Продукт с ID " + id + " не найден");
     }
   }
 }

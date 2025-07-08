@@ -1,7 +1,5 @@
 package ru.learning.java.spring.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.learning.java.spring.dto.UserRequest;
+import ru.learning.java.spring.exception.UserNotFoundException;
 import ru.learning.java.spring.model.User;
 import ru.learning.java.spring.service.UserService;
 
@@ -25,8 +24,6 @@ import java.util.Optional;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-  private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
   private final UserService userService;
 
   @Autowired
@@ -36,13 +33,9 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
-    try {
-      Optional<User> user = userService.getUserById(id);
-      return user.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    Optional<User> user = userService.getUserById(id);
+    return user.map(ResponseEntity::ok)
+      .orElseThrow(() -> new UserNotFoundException(id));
   }
 
   @GetMapping
@@ -53,53 +46,31 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<User> createUser(@RequestBody UserRequest userRequest) {
-    try {
-      User createdUser = userService.createUser(userRequest.getUsername());
-      return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    User createdUser = userService.createUser(userRequest.getUsername());
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody UserRequest userRequest) {
-    try {
-      User updatedUser = userService.updateUser(id, userRequest.getUsername());
-      return ResponseEntity.ok(updatedUser);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    User updatedUser = userService.updateUser(id, userRequest.getUsername());
+    return ResponseEntity.ok(updatedUser);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-    try {
-      boolean deleted = userService.deleteUser(id);
-      if (deleted) {
-        return ResponseEntity.noContent().build();
-      } else {
-        return ResponseEntity.notFound().build();
-      }
-    } catch (IllegalArgumentException e) {
-      logger.warn("Неверный запрос при удалении пользователя: {}", e.getMessage());
-      return ResponseEntity.badRequest().build();
-    } catch (IllegalStateException e) {
-      logger.warn("Конфликт при удалении пользователя: {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    } catch (RuntimeException e) {
-      logger.error("Внутренняя ошибка при удалении пользователя с ID {}: {}", id, e.getMessage());
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    boolean deleted = userService.deleteUser(id);
+    if (deleted) {
+      return ResponseEntity.noContent().build();
+    } else {
+      throw new UserNotFoundException(id);
     }
-
   }
 
   @GetMapping("/search")
   public ResponseEntity<User> findByUsername(@RequestParam String username) {
-    if (username == null || username.trim().isEmpty()) {
-      return ResponseEntity.badRequest().build();
-    }
     Optional<User> user = userService.findByUsername(username);
-    return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    return user.map(ResponseEntity::ok)
+      .orElseThrow(() -> new UserNotFoundException("Пользователь с именем '" + username + "' не найден"));
   }
 
   @GetMapping("/search/containing")
