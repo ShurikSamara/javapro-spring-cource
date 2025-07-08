@@ -40,7 +40,7 @@ public class PaymentService {
         url,
         HttpMethod.GET,
         null,
-        new ParameterizedTypeReference<List<Product>>() {}
+        new ParameterizedTypeReference<>() {}
       );
       return response.getBody();
     } catch (RestClientException e) {
