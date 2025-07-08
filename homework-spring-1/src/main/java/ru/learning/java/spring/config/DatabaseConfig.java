@@ -2,7 +2,6 @@ package ru.learning.java.spring.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,8 +10,11 @@ import javax.sql.DataSource;
 @Configuration
 public class DatabaseConfig {
 
-  @Autowired
-  private DatabaseProperties databaseProperties;
+  private final DatabaseProperties databaseProperties;
+
+  public DatabaseConfig(DatabaseProperties databaseProperties) {
+    this.databaseProperties = databaseProperties;
+  }
 
   @Bean
   public DataSource dataSource() {
