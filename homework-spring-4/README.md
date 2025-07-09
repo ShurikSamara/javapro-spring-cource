@@ -24,7 +24,7 @@
 1. Собрать модели и DTO:
 ```
 cd shared-models
-clean install -f pom.xml
+mvn clean install -f pom.xml
 ```
 
 2. Запустить сервис продуктов:
