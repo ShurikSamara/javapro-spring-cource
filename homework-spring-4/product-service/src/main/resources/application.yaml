@@ -1,29 +1,29 @@
 server:
   servlet:
     context-path: /api/v1
-  port: '8081'
+  port: 8081
 
 spring:
+  config:
+    activate:
+      on-profile: docker
   datasource:
-    driverClassName: org.h2.Driver
+    driverClassName: org.postgresql.Driver
     username: product_user
     password: product_pass
-    url: jdbc:h2:mem:product_db
+    url: jdbc:postgresql://product-db:5432/product_db
   flyway:
-    enabled: 'true'
+    enabled: true
     locations: classpath:migration
-    baseline-on-migrate: 'true'
-    validate-on-migrate: 'true'
-    clean-disabled: 'false'
-  h2:
-    console:
-      path: /h2-console
-      enabled: 'true'
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    clean-disabled: false
   jpa:
-    show-sql: 'true'
+    show-sql: true
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 logging:
   level:
     org:

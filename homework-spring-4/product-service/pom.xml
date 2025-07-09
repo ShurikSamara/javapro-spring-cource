@@ -13,6 +13,7 @@
 
     <properties>
         <flyway-core.version>11.8.2</flyway-core.version>
+        <postgresql.version>42.7.3</postgresql.version>
     </properties>
 
     <dependencies>
@@ -29,10 +30,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        <!-- PostgreSQL Driver -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+            <version>${postgresql.version}</version>
         </dependency>
         <!-- Flyway для миграций -->
         <dependency>

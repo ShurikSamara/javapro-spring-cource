@@ -1,31 +1,32 @@
 server:
   servlet:
     context-path: /api/v1
-  port: '8082'
+  port: 8082
+
 product-service:
-  url: http://localhost:8080/api/v1
+  url: http://localhost:8081/api/v1
 
 spring:
+  config:
+    activate:
+      on-profile: docker
   datasource:
-    driverClassName: org.h2.Driver
+    driver-class-name: org.postgresql.Driver
     username: payment_user
     password: payment_pass
-    url: jdbc:h2:mem:payment_db
+    url: jdbc:postgresql://payment-db:5432/payment_db
   flyway:
-    enabled: 'true'
+    enabled: true
     locations: classpath:migration
-    baseline-on-migrate: 'true'
-    validate-on-migrate: 'true'
-    clean-disabled: 'false'
-  h2:
-    console:
-      path: /h2-console
-      enabled: 'true'
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    clean-disabled: false
   jpa:
-    show-sql: 'true'
+    show-sql: true
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 logging:
   level:
     org:
