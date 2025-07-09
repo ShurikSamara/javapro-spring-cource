@@ -43,7 +43,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   @Query("SELECT p.productType, COUNT(p) FROM Product p GROUP BY p.productType")
   List<Object[]> getProductCountByType();
 
-  @Query("SELECT SUM(p.price) FROM Product p WHERE p.clientId = :clientId")
+  @Query("SELECT SUM(p.balance) FROM Product p WHERE p.clientId = :clientId")
   BigDecimal getTotalPriceByClientId(@Param("clientId") Long clientId);
 
   @Query("SELECT p FROM Product p WHERE p.balance > (SELECT AVG(p2.balance) FROM Product p2)")

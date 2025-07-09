@@ -30,7 +30,6 @@ public class PaymentService {
     return productServiceClient.getProductsByClientId(clientId);
   }
 
-  //Надо подумать над типами исключений для отката транзакции
   @Transactional(rollbackFor = {PaymentProcessingException.class, RuntimeException.class})
   public PaymentResponse processPayment(PaymentRequest request) {
     Product product = productServiceClient.getProductById(request.getProductId());
