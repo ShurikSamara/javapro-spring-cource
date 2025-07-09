@@ -7,6 +7,7 @@ import ru.learning.java.spring.exception.ProductValidationException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.repository.ProductRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +21,48 @@ public class ProductService {
   }
 
   public Product updateProduct(Long id, Product product) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID продукта не может быть null");
+    }
+
+    if (product == null) {
+      throw new ProductNotFoundException("Продукт не может быть null");
+    }
+
     if (!productRepository.existsById(id)) {
       throw new ProductNotFoundException("Продукт с ID " + id + " не найден");
     }
-    if (product.getAccountNumber() == null || product.getAccountNumber().isEmpty()) {
+
+    if (product.getId() != null && !product.getId().equals(id)) {
+      throw new ProductValidationException("ID продукта в path [" + id + "] не совпадает с ID в теле [" + product.getId() + "]");
+    }
+
+    validateProduct(product);
+    product.setId(id);
+
+    return productRepository.save(product);
+  }
+
+  private void validateProduct(Product product) {
+    if (product.getAccountNumber() == null || product.getAccountNumber().trim().isEmpty()) {
       throw new ProductValidationException("Номер счета обязателен");
     }
-    return productRepository.save(product);
+
+    if (product.getPrice() == null) {
+      throw new ProductValidationException("Цена обязательна");
+    }
+
+    if (product.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+      throw new ProductValidationException("Цена не может быть отрицательной");
+    }
+
+    if (product.getProductType() == null) {
+      throw new ProductValidationException("Тип продукта обязателен");
+    }
+
+    if (product.getClientId() == null) {
+      throw new ProductValidationException("ID клиента обязателен");
+    }
   }
 
   public void deleteProduct(Long id) {
