@@ -22,30 +22,30 @@ public class Product {
   private String accountNumber;
 
   @Column(nullable = false)
-  private BigDecimal balance;
+  private BigDecimal price;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "product_type", nullable = false)
   private ProductType productType;
 
-  @Column(name = "user_id", nullable = false)
-  private Long userId;
+  @Column(name = "client_id", nullable = false)
+  private Long clientId;
 
   public Product() {}
 
-  public Product(String accountNumber, BigDecimal balance, ProductType productType, Long userId) {
+  public Product(String accountNumber, BigDecimal price, ProductType productType, Long clientId) {
     this.accountNumber = accountNumber;
-    this.balance = balance;
+    this.price = price;
     this.productType = productType;
-    this.userId = userId;
+    this.clientId = clientId;
   }
 
-  public Product(Long id, String accountNumber, BigDecimal balance, ProductType productType, Long userId) {
+  public Product(Long id, String accountNumber, BigDecimal price, ProductType productType, Long clientId) {
     this.id = id;
     this.accountNumber = accountNumber;
-    this.balance = balance;
+    this.price = price;
     this.productType = productType;
-    this.userId = userId;
+    this.clientId = clientId;
   }
 
   public Long getId() {
@@ -60,20 +60,20 @@ public class Product {
     return accountNumber;
   }
 
-  public BigDecimal getBalance() {
-    return balance;
+  public BigDecimal getPrice() {
+    return price;
   }
 
-  public void setBalance(BigDecimal balance) {
-    this.balance = balance;
+  public void setPrice(BigDecimal balance) {
+    this.price = balance;
   }
 
   public ProductType getProductType() {
     return productType;
   }
 
-  public Long getUserId() {
-    return userId;
+  public Long getClientId() {
+    return clientId;
   }
 
   @Override
@@ -81,9 +81,9 @@ public class Product {
     return "Product{" +
       "id=" + id +
       ", accountNumber='" + accountNumber + '\'' +
-      ", balance=" + balance +
+      ", price =" + price +
       ", productType=" + productType +
-      ", userId=" + userId +
+      ", clientId=" + clientId +
       '}';
   }
 }

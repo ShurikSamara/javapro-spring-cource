@@ -17,9 +17,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
   List<Product> findByProductType(ProductType productType);
 
-  @Query("SELECT p FROM Product p WHERE p.userId = :userId AND p.productType = :productType")
+  @Query("SELECT p FROM Product p WHERE p.clientId = :userId AND p.productType = :productType")
   List<Product> findByUserIdAndProductType(@Param("userId") Long userId, @Param("productType") ProductType productType);
 
-  @Query("SELECT p FROM Product p WHERE p.balance >= :minBalance")
+  @Query("SELECT p FROM Product p WHERE p.price >= :minBalance")
   List<Product> findByBalanceGreaterThanEqual(@Param("minBalance") BigDecimal minBalance);
+
+  boolean existsByAccountNumber(String accountNumber);
 }
