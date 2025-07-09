@@ -26,8 +26,8 @@ public class PaymentService {
     this.accountService = accountService;
   }
 
-  public List<Product> getUserProducts(Long userId) {
-    return productServiceClient.getProductsByUserId(userId);
+  public List<Product> getClientProducts(Long clientId) {
+    return productServiceClient.getProductsByClientId(clientId);
   }
 
   //Надо подумать над типами исключений для отката транзакции
@@ -35,21 +35,21 @@ public class PaymentService {
   public PaymentResponse processPayment(PaymentRequest request) {
     Product product = productServiceClient.getProductById(request.getProductId());
 
-    if (!accountService.hasEnoughBalance(request.getUserId(), product.getPrice())) {
+    if (!accountService.hasEnoughBalance(request.getClientId(), product.getBalance())) {
       throw new InsufficientFundsException("Insufficient funds for payment");
     }
 
     Payment payment = new Payment();
-    payment.setClientId(request.getUserId());
+    payment.setClientId(request.getClientId());
     payment.setProductId(request.getProductId());
-    payment.setAmount(product.getPrice());
+    payment.setAmount(product.getBalance());
     payment.setStatus(PaymentStatus.PENDING);
     payment.setCreatedAt(LocalDateTime.now());
 
     payment = paymentRepository.save(payment);
 
     try {
-      accountService.debitAccount(request.getUserId(), product.getPrice());
+      accountService.debitAccount(request.getClientId(), product.getBalance());
 
       payment.setStatus(PaymentStatus.COMPLETED);
       payment = paymentRepository.save(payment);

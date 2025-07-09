@@ -27,9 +27,9 @@ public class PaymentController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/user/{userId}/products")
-  public ResponseEntity<List<Product>> getUserProducts(@PathVariable Long userId) {
-    List<Product> products = paymentService.getUserProducts(userId);
+  @GetMapping("/client/{clientId}/products")
+  public ResponseEntity<List<Product>> getClientProducts(@PathVariable Long clientId) {
+    List<Product> products = paymentService.getClientProducts(clientId);
     return ResponseEntity.ok(products);
   }
 }

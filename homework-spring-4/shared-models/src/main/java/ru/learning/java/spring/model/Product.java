@@ -22,7 +22,7 @@ public class Product {
   private String accountNumber;
 
   @Column(nullable = false)
-  private BigDecimal price;
+  private BigDecimal balance;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "product_type", nullable = false)
@@ -33,17 +33,17 @@ public class Product {
 
   public Product() {}
 
-  public Product(String accountNumber, BigDecimal price, ProductType productType, Long clientId) {
+  public Product(String accountNumber, BigDecimal balance, ProductType productType, Long clientId) {
     this.accountNumber = accountNumber;
-    this.price = price;
+    this.balance = balance;
     this.productType = productType;
     this.clientId = clientId;
   }
 
-  public Product(Long id, String accountNumber, BigDecimal price, ProductType productType, Long clientId) {
+  public Product(Long id, String accountNumber, BigDecimal balance, ProductType productType, Long clientId) {
     this.id = id;
     this.accountNumber = accountNumber;
-    this.price = price;
+    this.balance = balance;
     this.productType = productType;
     this.clientId = clientId;
   }
@@ -60,12 +60,12 @@ public class Product {
     return accountNumber;
   }
 
-  public BigDecimal getPrice() {
-    return price;
+  public BigDecimal getBalance() {
+    return balance;
   }
 
-  public void setPrice(BigDecimal balance) {
-    this.price = balance;
+  public void setBalance(BigDecimal balance) {
+    this.balance = balance;
   }
 
   public ProductType getProductType() {
@@ -81,7 +81,7 @@ public class Product {
     return "Product{" +
       "id=" + id +
       ", accountNumber='" + accountNumber + '\'' +
-      ", price =" + price +
+      ", balance =" + balance +
       ", productType=" + productType +
       ", clientId=" + clientId +
       '}';

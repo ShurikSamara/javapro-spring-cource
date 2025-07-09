@@ -48,11 +48,11 @@ public class ProductService {
       throw new ProductValidationException("Номер счета обязателен");
     }
 
-    if (product.getPrice() == null) {
+    if (product.getBalance() == null) {
       throw new ProductValidationException("Цена обязательна");
     }
 
-    if (product.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+    if (product.getBalance().compareTo(BigDecimal.ZERO) < 0) {
       throw new ProductValidationException("Цена не может быть отрицательной");
     }
 

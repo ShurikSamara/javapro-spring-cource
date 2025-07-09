@@ -23,8 +23,8 @@ public class ProductServiceClient {
     this.restTemplate = restTemplate;
   }
 
-  public List<Product> getProductsByUserId(Long userId) {
-    String url = productServiceUrl + "/api/v1/products/user/" + userId;
+  public List<Product> getProductsByClientId(Long clientId) {
+    String url = productServiceUrl + "/api/v1/products/client/" + clientId;
     ResponseEntity<List<Product>> response = restTemplate.exchange(
       url,
       HttpMethod.GET,
