@@ -1,7 +1,7 @@
 package ru.learning.java.spring.service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.learning.java.spring.dto.PaymentRequest;
 import ru.learning.java.spring.dto.PaymentResponse;
 import ru.learning.java.spring.exception.InsufficientFundsException;
@@ -30,7 +30,8 @@ public class PaymentService {
     return productServiceClient.getProductsByUserId(userId);
   }
 
-  @Transactional
+  //Надо подумать над типами исключений для отката транзакции
+  @Transactional(rollbackFor = {PaymentProcessingException.class, RuntimeException.class})
   public PaymentResponse processPayment(PaymentRequest request) {
     Product product = productServiceClient.getProductById(request.getProductId());
 
@@ -57,7 +58,7 @@ public class PaymentService {
     } catch (Exception e) {
       payment.setStatus(PaymentStatus.FAILED);
       paymentRepository.save(payment);
-      throw new PaymentProcessingException("Payment processing failed");
+      throw new PaymentProcessingException("Payment processing failed: " + e.getMessage(), e);
     }
   }
 }
