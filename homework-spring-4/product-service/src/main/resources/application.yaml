@@ -8,10 +8,18 @@ spring:
     activate:
       on-profile: docker
   datasource:
-    driverClassName: org.postgresql.Driver
     username: product_user
     password: product_pass
     url: jdbc:postgresql://product-db:5432/product_db
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+      connection-test-query: SELECT 1
   flyway:
     enabled: true
     locations: classpath:migration
