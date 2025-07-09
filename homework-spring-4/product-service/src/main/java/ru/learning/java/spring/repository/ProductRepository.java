@@ -13,12 +13,14 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-  List<Product> findByUserId(Long userId);
+  Product getProductById(Long productId);
+
+  List<Product> findByClientId(Long clientId);
 
   List<Product> findByProductType(ProductType productType);
 
-  @Query("SELECT p FROM Product p WHERE p.clientId = :userId AND p.productType = :productType")
-  List<Product> findByUserIdAndProductType(@Param("userId") Long userId, @Param("productType") ProductType productType);
+  @Query("SELECT p FROM Product p WHERE p.clientId = :clientId AND p.productType = :productType")
+  List<Product> findByClientIdAndProductType(@Param("clientId") Long clientId, @Param("productType") ProductType productType);
 
   @Query("SELECT p FROM Product p WHERE p.price >= :minBalance")
   List<Product> findByBalanceGreaterThanEqual(@Param("minBalance") BigDecimal minBalance);

@@ -1,6 +1,5 @@
 package ru.learning.java.spring.service;
 
-
 import org.springframework.stereotype.Service;
 import ru.learning.java.spring.exception.ProductAlreadyExistsException;
 import ru.learning.java.spring.exception.ProductNotFoundException;
@@ -14,7 +13,7 @@ import java.util.Optional;
 
 @Service
 public class ProductService {
-  
+
   private final ProductRepository productRepository;
 
   public ProductService(ProductRepository productRepository) {
@@ -25,12 +24,9 @@ public class ProductService {
     if (!productRepository.existsById(id)) {
       throw new ProductNotFoundException("Продукт с ID " + id + " не найден");
     }
-
-    // Валидация продукта
     if (product.getAccountNumber() == null || product.getAccountNumber().isEmpty()) {
       throw new ProductValidationException("Номер счета обязателен");
     }
-
     return productRepository.save(product);
   }
 
@@ -42,21 +38,24 @@ public class ProductService {
   }
 
   public Product createProduct(Product product) {
-    //Есть ли такой счёт
     if (productRepository.existsByAccountNumber(product.getAccountNumber())) {
-      throw new ProductAlreadyExistsException("Продукт с номером счета " +
-        product.getAccountNumber() + " уже существует");
+      throw new ProductAlreadyExistsException("Продукт с номером счета " + product.getAccountNumber() + " уже существует");
     }
-
     return productRepository.save(product);
   }
 
   public Optional<Product> getProductById(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID продукта не может быть null");
+    }
     return productRepository.findById(id);
   }
 
-  public List<Product> getProductsByUserId(Long userId) {
-    return productRepository.findByUserId(userId);
+  public List<Product> getProductsByClientId(Long clientId) {
+    if (clientId == null) {
+      throw new IllegalArgumentException("ID пользователя не может быть null");
+    }
+    return productRepository.findByClientId(clientId);
   }
 
   public List<Product> getAllProducts() {

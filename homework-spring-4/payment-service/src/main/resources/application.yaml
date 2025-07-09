@@ -1,24 +1,30 @@
 server:
-  port: 8081
+  servlet:
+    context-path: /api/v1
+  port: '8081'
+product-service:
+  url: http://localhost:8080/api/v1
 
 spring:
   datasource:
-    url: jdbc:h2:mem:paymentdb
-    driver-class-name: org.h2.Driver
-    username: payment_user
+    driverClassName: org.h2.Driver
     password: password
-
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-
+    username: sa
+    url: jdbc:h2:mem:paymentdb
   h2:
     console:
-      enabled: true
       path: /h2-console
-
-product:
-  service:
-    url: http://localhost:8080
+      enabled: 'true'
+  jpa:
+    show-sql: 'true'
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+logging:
+  level:
+    org:
+      springframework: INFO
+    ru:
+      learning:
+        java:
+          spring: DEBUG

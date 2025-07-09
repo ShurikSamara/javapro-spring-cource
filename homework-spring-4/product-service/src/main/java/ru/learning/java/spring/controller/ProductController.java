@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.learning.java.spring.exception.ProductNotFoundException;
+import ru.learning.java.spring.exception.ResourceNotFoundException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.service.ProductService;
 
@@ -33,12 +33,12 @@ public class ProductController {
   public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
     Optional<Product> product = productService.getProductById(id);
     return product.map(ResponseEntity::ok)
-      .orElseThrow(() -> new ProductNotFoundException("Продукт с ID " + id + " не найден"));
+      .orElseThrow(() -> new ResourceNotFoundException("Продукт с ID " + id + " не найден"));
   }
 
   @GetMapping("/user/{userId}")
   public ResponseEntity<List<Product>> getProductsByUserId(@PathVariable("userId") Long userId) {
-    List<Product> products = productService.getProductsByUserId(userId);
+    List<Product> products = productService.getProductsByClientId(userId);
     return ResponseEntity.ok(products);
   }
 
