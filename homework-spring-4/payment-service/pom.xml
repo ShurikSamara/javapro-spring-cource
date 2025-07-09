@@ -11,6 +11,10 @@
 
     <artifactId>payment-service</artifactId>
 
+    <properties>
+        <flyway-core.version>11.8.2</flyway-core.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>ru.learning.java</groupId>
@@ -29,6 +33,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!-- Flyway для миграций -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway-core.version}</version>
         </dependency>
     </dependencies>
 

@@ -20,9 +20,7 @@ public class PaymentService {
   private final ProductServiceClient productServiceClient;
   private final AccountService accountService;
 
-  public PaymentService(PaymentRepository paymentRepository,
-                        ProductServiceClient productServiceClient,
-                        AccountService accountService) {
+  public PaymentService(PaymentRepository paymentRepository, ProductServiceClient productServiceClient, AccountService accountService) {
     this.paymentRepository = paymentRepository;
     this.productServiceClient = productServiceClient;
     this.accountService = accountService;
@@ -34,36 +32,32 @@ public class PaymentService {
 
   @Transactional
   public PaymentResponse processPayment(PaymentRequest request) {
+    Product product = productServiceClient.getProductById(request.getProductId());
+
+    if (!accountService.hasEnoughBalance(request.getUserId(), product.getPrice())) {
+      throw new InsufficientFundsException("Insufficient funds for payment");
+    }
+
+    Payment payment = new Payment();
+    payment.setClientId(request.getUserId());
+    payment.setProductId(request.getProductId());
+    payment.setAmount(product.getPrice());
+    payment.setStatus(PaymentStatus.PENDING);
+    payment.setCreatedAt(LocalDateTime.now());
+
+    payment = paymentRepository.save(payment);
+
     try {
-      Product product = productServiceClient.getProductById(request.getProductId());
+      accountService.debitAccount(request.getUserId(), product.getPrice());
 
-      if (!accountService.hasEnoughBalance(request.getUserId(), product.getPrice())) {
-        throw new InsufficientFundsException("Insufficient funds for payment");
-      }
-
-      Payment payment = new Payment();
-      payment.setClientId(request.getUserId());
-      payment.setProductId(request.getProductId());
-      payment.setAmount(product.getPrice());
-      payment.setStatus(PaymentStatus.PENDING);
-      payment.setCreatedAt(LocalDateTime.now());
-
+      payment.setStatus(PaymentStatus.COMPLETED);
       payment = paymentRepository.save(payment);
 
-      try {
-        accountService.debitAccount(request.getUserId(), product.getPrice());
-
-        payment.setStatus(PaymentStatus.COMPLETED);
-        payment = paymentRepository.save(payment);
-
-        return new PaymentResponse(payment.getId(), "COMPLETED", payment.getAmount(), "Payment processed successfully");
-      } catch (Exception e) {
-        payment.setStatus(PaymentStatus.FAILED);
-        paymentRepository.save(payment);
-        throw new PaymentProcessingException("Payment processing failed");
-      }
+      return new PaymentResponse(payment.getId(), "COMPLETED", payment.getAmount(), "Payment processed successfully");
     } catch (Exception e) {
-      throw e;
+      payment.setStatus(PaymentStatus.FAILED);
+      paymentRepository.save(payment);
+      throw new PaymentProcessingException("Payment processing failed");
     }
   }
 }

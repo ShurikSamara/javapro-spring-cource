@@ -8,7 +8,13 @@ spring:
     driverClassName: org.h2.Driver
     password: password
     username: sa
-    url: jdbc:h2:mem:paymentdb
+    url: jdbc:h2:mem:product_db
+  flyway:
+    enabled: 'true'
+    locations: classpath:migration
+    baseline-on-migrate: 'true'
+    validate-on-migrate: 'true'
+    clean-disabled: 'false'
   h2:
     console:
       path: /h2-console

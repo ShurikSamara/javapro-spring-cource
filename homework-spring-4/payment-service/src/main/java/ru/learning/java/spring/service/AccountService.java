@@ -8,7 +8,6 @@ import java.util.Map;
 
 @Service
 public class AccountService {
-  // Простая in-memory реализация для демонстрации
   private final Map<Long, BigDecimal> accountBalances = new HashMap<>();
 
   public AccountService() {
@@ -18,22 +17,22 @@ public class AccountService {
     accountBalances.put(3L, new BigDecimal("100.00"));
   }
 
-  public boolean hasEnoughBalance(Long userId, BigDecimal amount) {
-    BigDecimal balance = accountBalances.getOrDefault(userId, BigDecimal.ZERO);
+  public boolean hasEnoughBalance(Long clientId, BigDecimal amount) {
+    BigDecimal balance = accountBalances.getOrDefault(clientId, BigDecimal.ZERO);
     return balance.compareTo(amount) >= 0;
   }
 
-  public void debitAccount(Long userId, BigDecimal amount) {
-    BigDecimal balance = accountBalances.getOrDefault(userId, BigDecimal.ZERO);
+  public void debitAccount(Long clientId, BigDecimal amount) {
+    BigDecimal balance = accountBalances.getOrDefault(clientId, BigDecimal.ZERO);
 
     if (balance.compareTo(amount) < 0) {
       throw new InsufficientFundsException("Недостаточно средств на счете");
     }
 
-    accountBalances.put(userId, balance.subtract(amount));
+    accountBalances.put(clientId, balance.subtract(amount));
   }
 
-  public BigDecimal getBalance(Long userId) {
-    return accountBalances.getOrDefault(userId, BigDecimal.ZERO);
+  public BigDecimal getBalance(Long clientId) {
+    return accountBalances.getOrDefault(clientId, BigDecimal.ZERO);
   }
 }
