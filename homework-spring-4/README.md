@@ -41,14 +41,14 @@ mvn spring-boot:run
 
 ## API Endpoints
 
-### Сервис продуктов (порт 8080)
+### Сервис продуктов (порт 8081)
 - GET /api/v1/products/{id} - получить продукт по ID
 - GET /api/v1/products/client/{clientId} - получить все продукты клиента
 - POST /api/v1/products - создать новый продукт
 - PUT /api/v1/products/{id} - обновить продукт
 - DELETE /api/v1/products/{id} - удалить продукт
 
-### Платежный сервис (порт 8081)
+### Платежный сервис (порт 8082)
 - GET /api/v1/payments/client/{clientId}/products - получить все продукты клиента через платежный сервис
 - POST /api/v1/payments/process - обработать платеж
 
