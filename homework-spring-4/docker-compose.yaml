@@ -41,7 +41,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Product Service
+  # product-service
   product-service:
     build:
       context: ./product-service
@@ -60,7 +60,7 @@ services:
     networks:
       - microservices-network
 
-  # Payment Service
+  # payment-service
   payment-service:
     build:
       context: ./payment-service
