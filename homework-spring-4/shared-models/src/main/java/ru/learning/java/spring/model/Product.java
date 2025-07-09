@@ -64,10 +64,6 @@ public class Product {
     return balance;
   }
 
-  public void setBalance(BigDecimal balance) {
-    this.balance = balance;
-  }
-
   public ProductType getProductType() {
     return productType;
   }
