@@ -33,18 +33,6 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
      */
     boolean existsByUserId(Long userId);
 
-    /**
-     * Обновляем текущий лимит пользователя
-     *
-     * @param userId       the user ID
-     * @param currentLimit the new current limit
-     * @param lastUpdated  the last updated timestamp
-     * @return the number of rows affected
-     */
-    @Modifying
-    @Query("UPDATE PaymentLimit pl SET pl.currentLimit = :currentLimit, pl.lastUpdated = :lastUpdated WHERE pl.userId = :userId")
-    int updateCurrentLimit(@Param("userId") Long userId, @Param("currentLimit") BigDecimal currentLimit, @Param("lastUpdated") LocalDateTime lastUpdated);
-
 
     /**
      * Уменьшаем лимит атомарно с проверкой достаточности средств
@@ -52,7 +40,7 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
      * @param userId       ID пользователя
      * @param amount       сумма для уменьшения
      * @param lastUpdated  timestamp обновления
-     * @return количество обновленных строк (1 - успех, 0 - недостаточно средств или пользователь не найден)
+     * @return количество обновлённых строк (1 - успех, 0 - недостаточно средств или пользователь не найден)
      */
     @Modifying
     @Query("UPDATE PaymentLimit pl SET pl.currentLimit = pl.currentLimit - :amount, pl.lastUpdated = :lastUpdated " +
@@ -67,7 +55,7 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
      * @param userId       ID пользователя
      * @param amount       сумма для восстановления
      * @param lastUpdated  timestamp обновления
-     * @return количество обновленных строк
+     * @return количество обновлённых строк
      */
     @Modifying
     @Query("UPDATE PaymentLimit pl SET pl.currentLimit = " +

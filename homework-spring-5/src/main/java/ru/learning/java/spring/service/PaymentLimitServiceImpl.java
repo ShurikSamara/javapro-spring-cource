@@ -126,11 +126,6 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
     return count;
   }
 
-  private PaymentLimit getPaymentLimitEntity(Long userId) {
-    return paymentLimitRepository.findByUserId(userId)
-      .orElseGet(() -> createNewUserLimit(userId));
-  }
-
   /**
    * Создаём новый лимит платежей для пользователя с лимитом по умолчанию
    */
