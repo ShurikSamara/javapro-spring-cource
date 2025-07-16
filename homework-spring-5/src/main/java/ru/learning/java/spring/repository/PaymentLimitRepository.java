@@ -26,6 +26,14 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
     Optional<PaymentLimit> findByUserId(Long userId);
 
     /**
+     * Проверим существование лимита для пользователя
+     *
+     * @param userId the user ID
+     * @return true if limit found
+     */
+    boolean existsByUserId(Long userId);
+
+    /**
      * Обновляем текущий лимит пользователя
      *
      * @param userId       the user ID
@@ -36,6 +44,41 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
     @Modifying
     @Query("UPDATE PaymentLimit pl SET pl.currentLimit = :currentLimit, pl.lastUpdated = :lastUpdated WHERE pl.userId = :userId")
     int updateCurrentLimit(@Param("userId") Long userId, @Param("currentLimit") BigDecimal currentLimit, @Param("lastUpdated") LocalDateTime lastUpdated);
+
+
+    /**
+     * Уменьшаем лимит атомарно с проверкой достаточности средств
+     *
+     * @param userId       ID пользователя
+     * @param amount       сумма для уменьшения
+     * @param lastUpdated  timestamp обновления
+     * @return количество обновленных строк (1 - успех, 0 - недостаточно средств или пользователь не найден)
+     */
+    @Modifying
+    @Query("UPDATE PaymentLimit pl SET pl.currentLimit = pl.currentLimit - :amount, pl.lastUpdated = :lastUpdated " +
+      "WHERE pl.userId = :userId AND pl.currentLimit >= :amount")
+    int decreaseLimit(@Param("userId") Long userId,
+                      @Param("amount") BigDecimal amount,
+                      @Param("lastUpdated") LocalDateTime lastUpdated);
+
+    /**
+     * Восстановление лимита атомарно с ограничением по максимальному значению
+     *
+     * @param userId       ID пользователя
+     * @param amount       сумма для восстановления
+     * @param lastUpdated  timestamp обновления
+     * @return количество обновленных строк
+     */
+    @Modifying
+    @Query("UPDATE PaymentLimit pl SET pl.currentLimit = " +
+      "CASE WHEN pl.currentLimit + :amount > pl.defaultLimit " +
+      "THEN pl.defaultLimit " +
+      "ELSE pl.currentLimit + :amount END, " +
+      "pl.lastUpdated = :lastUpdated " +
+      "WHERE pl.userId = :userId")
+    int restoreLimit(@Param("userId") Long userId,
+                     @Param("amount") BigDecimal amount,
+                     @Param("lastUpdated") LocalDateTime lastUpdated);
 
     /**
      * Сбросить все лимиты до значений по умолчанию

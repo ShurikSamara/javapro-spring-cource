@@ -36,7 +36,6 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public LimitResponse getUserLimit(Long userId) {
     log.debug("Получение платежного лимита для пользователя с ID: {}", userId);
 
@@ -54,31 +53,31 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
 
     validateAmount(request.amount());
 
-    PaymentLimit limit = getPaymentLimitEntity(request.userId());
+    // Убедимся, что пользователь существует, если нет - создадим
+    if (!paymentLimitRepository.existsByUserId(request.userId())) {
+      createNewUserLimit(request.userId());
+    }
 
-    if (limit.getCurrentLimit().compareTo(request.amount()) < 0) {
-      log.warn("У пользователя с ID: {} недостаточно лимита. Текущий: {}, Запрошенный: {}",
-        request.userId(), limit.getCurrentLimit(), request.amount());
+    LocalDateTime now = LocalDateTime.now();
+    int updated = paymentLimitRepository.decreaseLimit(request.userId(), request.amount(), now);
+
+    if (updated == 0) {
+      // Проверяем, существует ли пользователь
+      if (!paymentLimitRepository.existsByUserId(request.userId())) {
+        throw new IllegalArgumentException("User not found: " + request.userId());
+      }
+      // Если пользователь существует, но обновление не произошло - недостаточно средств
+      log.warn("У пользователя с ID: {} недостаточно лимита для суммы: {}",
+        request.userId(), request.amount());
       throw new IllegalStateException("Not enough limit available");
     }
 
-    BigDecimal newLimit = limit.getCurrentLimit().subtract(request.amount());
-    LocalDateTime now = LocalDateTime.now();
-
-    int updated = paymentLimitRepository.updateCurrentLimit(request.userId(), newLimit, now);
-    if (updated != 1) {
-      if (!paymentLimitRepository.existsById(request.userId())) {
-        throw new IllegalArgumentException("User not found: " + request.userId());
-      }
-      log.warn("Не удалось обновить лимит для пользователя с ID: {}", request.userId());
-      throw new IllegalStateException("Failed to update limit");
-    }
-
-    limit.setCurrentLimit(newLimit);
-    limit.setLastUpdated(now);
+    // Получаем обновлённый лимит для ответа
+    PaymentLimit limit = paymentLimitRepository.findByUserId(request.userId())
+      .orElseThrow(() -> new IllegalStateException("User limit not found after update"));
 
     log.info("Уменьшен лимит для пользователя с ID: {} на сумму: {}. Новый лимит: {}",
-      request.userId(), request.amount(), newLimit);
+      request.userId(), request.amount(), limit.getCurrentLimit());
 
     return limitMapper.toResponse(limit);
   }
@@ -91,30 +90,27 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
 
     validateAmount(request.amount());
 
-    PaymentLimit limit = getPaymentLimitEntity(request.userId());
-    BigDecimal newLimit = limit.getCurrentLimit().add(request.amount());
-
-    if (newLimit.compareTo(limit.getDefaultLimit()) > 0) {
-      newLimit = limit.getDefaultLimit();
-      log.debug("Capping restored limit to default limit: {}", newLimit);
+    // Убедимся, что пользователь существует, если нет - создадим
+    if (!paymentLimitRepository.existsByUserId(request.userId())) {
+      createNewUserLimit(request.userId());
     }
 
     LocalDateTime now = LocalDateTime.now();
+    int updated = paymentLimitRepository.restoreLimit(request.userId(), request.amount(), now);
 
-    int updated = paymentLimitRepository.updateCurrentLimit(request.userId(), newLimit, now);
-    if (updated != 1) {
-      log.warn("Failed to update limit for user ID: {}", request.userId());
-      throw new IllegalStateException("Failed to update limit");
+    if (updated == 0) {
+      throw new IllegalArgumentException("User not found: " + request.userId());
     }
 
-    limit.setCurrentLimit(newLimit);
-    limit.setLastUpdated(now);
+    PaymentLimit limit = paymentLimitRepository.findByUserId(request.userId())
+      .orElseThrow(() -> new IllegalStateException("User limit not found after update"));
 
-    log.info("Restored limit for user ID: {} by amount: {}. New limit: {}",
-      request.userId(), request.amount(), newLimit);
+    log.info("Восстановлен лимит для пользователя с ID: {} на сумму: {}. Новый лимит: {}",
+      request.userId(), request.amount(), limit.getCurrentLimit());
 
     return limitMapper.toResponse(limit);
   }
+
 
   @Override
   @Transactional
@@ -136,7 +132,7 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
   }
 
   /**
-   * Создайте новый лимит платежей для пользователя с лимитом по умолчанию
+   * Создаём новый лимит платежей для пользователя с лимитом по умолчанию
    */
   private PaymentLimit createNewUserLimit(Long userId) {
     log.info("Creating new payment limit for user ID: {} with default limit: {}",
