@@ -67,6 +67,9 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
 
     int updated = paymentLimitRepository.updateCurrentLimit(request.userId(), newLimit, now);
     if (updated != 1) {
+      if (!paymentLimitRepository.existsById(request.userId())) {
+        throw new IllegalArgumentException("User not found: " + request.userId());
+      }
       log.warn("Не удалось обновить лимит для пользователя с ID: {}", request.userId());
       throw new IllegalStateException("Failed to update limit");
     }

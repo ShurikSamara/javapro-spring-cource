@@ -28,12 +28,20 @@ public class GlobalExceptionHandler {
    * NoResourceFoundException
    *
    * @param ex      the exception
+   * @param request the web request
    * @return the error response
    */
   @ExceptionHandler(NoResourceFoundException.class)
-  public ResponseEntity<String> handleResourceNotFound(NoResourceFoundException ex) {
+  public ResponseEntity<ErrorResponse> handleResourceNotFound(NoResourceFoundException ex, WebRequest request) {
     log.debug("Resource not found: {}", ex.getMessage());
-    return ResponseEntity.notFound().build();
+
+    ErrorResponse errorResponse = new ErrorResponse(
+      HttpStatus.NOT_FOUND.value(),
+      "Resource not found: " + ex.getMessage(),
+      request.getDescription(false)
+    );
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
 
   /**
@@ -90,9 +98,13 @@ public class GlobalExceptionHandler {
 
     Map<String, String> errors = new HashMap<>();
     ex.getBindingResult().getAllErrors().forEach(error -> {
-      String fieldName = ((FieldError) error).getField();
-      String errorMessage = error.getDefaultMessage();
-      errors.put(fieldName, errorMessage);
+      if (error instanceof FieldError fieldError) {
+        String fieldName = fieldError.getField();
+        String errorMessage = error.getDefaultMessage();
+        errors.put(fieldName, errorMessage);
+      } else {
+        errors.put("global", error.getDefaultMessage());
+      }
     });
 
     String errorMessage = errors.entrySet().stream()
