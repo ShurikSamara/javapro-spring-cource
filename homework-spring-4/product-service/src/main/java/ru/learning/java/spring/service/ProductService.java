@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import ru.learning.java.spring.exception.ProductAlreadyExistsException;
 import ru.learning.java.spring.exception.ProductNotFoundException;
 import ru.learning.java.spring.exception.ProductValidationException;
+import ru.learning.java.spring.exception.ResourceNotFoundException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -79,11 +79,11 @@ public class ProductService {
     return productRepository.save(product);
   }
 
-  public Optional<Product> getProductById(Long id) {
+  public Product getProductById(Long id) {
     if (id == null) {
       throw new IllegalArgumentException("ID продукта не может быть null");
     }
-    return productRepository.findById(id);
+    return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Продукт с ID " + id + " не найден"));
   }
 
   public List<Product> getProductsByClientId(Long clientId) {

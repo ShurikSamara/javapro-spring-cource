@@ -2,7 +2,6 @@ package ru.learning.java.spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.learning.java.spring.exception.ResourceNotFoundException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.service.ProductService;
 
@@ -31,17 +29,12 @@ public class ProductController {
 
   @GetMapping("/{id}")
   public Product getProductById(@PathVariable("id") Long id) {
-    if (id == null) {
-      throw new IllegalArgumentException("ID продукта не может быть null");
-    }
-    return productService.getProductById(id)
-      .orElseThrow(() -> new ResourceNotFoundException("Продукт с ID " + id + " не найден"));
+    return productService.getProductById(id);
   }
 
   @GetMapping("/client/{clientId}")
-  public ResponseEntity<List<Product>> getProductsByClientId(@PathVariable("clientId") Long clientId) {
-    List<Product> products = productService.getProductsByClientId(clientId);
-    return ResponseEntity.ok(products);
+  public List<Product> getProductsByClientId(@PathVariable("clientId") Long clientId) {
+    return productService.getProductsByClientId(clientId);
   }
 
   @GetMapping
@@ -56,18 +49,16 @@ public class ProductController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
+  public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
     if (product.getId() != null && !product.getId().equals(id)) {
       throw new IllegalArgumentException("ID в пути и в теле запроса не совпадают");
     }
-    product.setId(id);
-    Product updatedProduct = productService.updateProduct(id, product);
-    return ResponseEntity.ok(updatedProduct);
+    return productService.updateProduct(id, product);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteProduct(@PathVariable("id") Long id) {
     productService.deleteProduct(id);
-    return ResponseEntity.noContent().build();
   }
 }
