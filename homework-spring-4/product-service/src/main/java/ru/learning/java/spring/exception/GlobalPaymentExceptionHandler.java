@@ -105,38 +105,6 @@ public class GlobalPaymentExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
 
-  @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<Map<String, Object>> handleUserNotFoundException(
-    UserNotFoundException e, WebRequest request) {
-    logger.warn("Пользователь не найден: {}", e.getMessage());
-
-    Map<String, Object> errorResponse = createErrorResponse(
-      HttpStatus.NOT_FOUND, "User Not Found", e.getMessage(), request);
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-  }
-
-  @ExceptionHandler(UserAlreadyExistsException.class)
-  public ResponseEntity<Map<String, Object>> handleUserAlreadyExistsException(
-    UserAlreadyExistsException e, WebRequest request) {
-    logger.warn("Пользователь уже существует: {}", e.getMessage());
-
-    Map<String, Object> errorResponse = createErrorResponse(
-      HttpStatus.CONFLICT, "User Already Exists", e.getMessage(), request);
-
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-  }
-
-  @ExceptionHandler(UserConstraintViolationException.class)
-  public ResponseEntity<Map<String, Object>> handleUserConstraintViolationException(
-    UserConstraintViolationException e, WebRequest request) {
-    logger.warn("Нарушение ограничений пользователя: {}", e.getMessage());
-
-    Map<String, Object> errorResponse = createErrorResponse(
-      HttpStatus.CONFLICT, "Constraint Violation", e.getMessage(), request);
-
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-  }
 
   @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<Map<String, Object>> handleRuntimeException(

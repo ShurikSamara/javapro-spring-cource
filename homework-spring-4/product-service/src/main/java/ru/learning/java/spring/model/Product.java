@@ -31,7 +31,8 @@ public class Product {
   @Column(name = "client_id", nullable = false)
   private Long clientId;
 
-  public Product() {}
+  public Product() {
+  }
 
   public Product(String accountNumber, BigDecimal balance, ProductType productType, Long clientId) {
     this.accountNumber = accountNumber;

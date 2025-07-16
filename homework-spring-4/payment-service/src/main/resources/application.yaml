@@ -3,13 +3,24 @@ server:
     context-path: /api/v1
   port: 8082
 
+# Product service configuration
 product-service:
   url: http://localhost:8081/api/v1
 
+# Payment service configuration
+payment-service:
+  max-failed-payments: 5
+  connection-timeout: 5000
+  read-timeout: 5000
+  analytics-enabled: true
+
 spring:
+  # Profile-specific configuration
   config:
     activate:
       on-profile: docker
+
+  # Database configuration
   datasource:
     username: payment_user
     password: payment_pass
@@ -23,18 +34,23 @@ spring:
       max-lifetime: 1800000
       leak-detection-threshold: 60000
       connection-test-query: SELECT 1
+
+  # Flyway migration configuration
   flyway:
     enabled: true
     locations: classpath:migration
     baseline-on-migrate: true
     validate-on-migrate: true
     clean-disabled: false
+
+  # JPA configuration
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+# Logging configuration
 logging:
   level:
     org:

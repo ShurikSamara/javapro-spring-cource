@@ -41,6 +41,22 @@ public class GlobalPaymentExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 
+  @ExceptionHandler(ProductNotFoundException.class)
+  public ResponseEntity<Map<String, Object>> handleProductNotFoundException(ProductNotFoundException e, WebRequest request) {
+    logger.warn("Продукт не найден: {}", e.getMessage());
+
+    Map<String, Object> errorResponse = createErrorResponse(HttpStatus.NOT_FOUND, "Product Not Found", e.getMessage(), request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+  }
+
+  @ExceptionHandler(ProductServiceException.class)
+  public ResponseEntity<Map<String, Object>> handleProductServiceException(ProductServiceException e, WebRequest request) {
+    logger.error("Ошибка сервиса продуктов: {}", e.getMessage());
+
+    Map<String, Object> errorResponse = createErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Product Service Error", e.getMessage(), request);
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+  }
+
   private Map<String, Object> createErrorResponse(HttpStatus status, String error, String message, WebRequest request) {
     Map<String, Object> errorResponse = new HashMap<>();
     errorResponse.put("timestamp", LocalDateTime.now());

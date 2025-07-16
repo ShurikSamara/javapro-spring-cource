@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.learning.java.spring.exception.ResourceNotFoundException;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.service.ProductService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -30,28 +30,29 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
-    Optional<Product> product = productService.getProductById(id);
-    return product.map(ResponseEntity::ok)
+  public Product getProductById(@PathVariable("id") Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("ID продукта не может быть null");
+    }
+    return productService.getProductById(id)
       .orElseThrow(() -> new ResourceNotFoundException("Продукт с ID " + id + " не найден"));
   }
 
-  @GetMapping("/user/{userId}")
-  public ResponseEntity<List<Product>> getProductsByUserId(@PathVariable("userId") Long userId) {
-    List<Product> products = productService.getProductsByClientId(userId);
+  @GetMapping("/client/{clientId}")
+  public ResponseEntity<List<Product>> getProductsByClientId(@PathVariable("clientId") Long clientId) {
+    List<Product> products = productService.getProductsByClientId(clientId);
     return ResponseEntity.ok(products);
   }
 
   @GetMapping
-  public ResponseEntity<List<Product>> getAllProducts() {
-    List<Product> products = productService.getAllProducts();
-    return ResponseEntity.ok(products);
+  public List<Product> getAllProducts() {
+    return productService.getAllProducts();
   }
 
   @PostMapping
-  public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-    Product createdProduct = productService.createProduct(product);
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+  @ResponseStatus(HttpStatus.CREATED)
+  public Product createProduct(@RequestBody Product product) {
+    return productService.createProduct(product);
   }
 
   @PutMapping("/{id}")

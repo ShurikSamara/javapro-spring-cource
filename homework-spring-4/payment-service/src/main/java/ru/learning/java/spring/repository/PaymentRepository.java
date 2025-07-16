@@ -17,11 +17,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   List<Payment> findByClientId(Long clientId);
 
-  List<Payment> findByProductId(Long productId);
-
   List<Payment> findByStatus(PaymentStatus status);
-
-  List<Payment> findByClientIdAndStatus(Long clientId, PaymentStatus status);
 
   List<Payment> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
@@ -39,16 +35,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   Optional<Payment> findTopByClientIdOrderByCreatedAtDesc(Long clientId);
 
-  List<Payment> findByClientIdOrderByCreatedAtDesc(Long clientId);
-
   @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.clientId = :clientId AND p.status = :status")
   BigDecimal getTotalAmountByClientIdAndStatus(@Param("clientId") Long clientId, @Param("status") PaymentStatus status);
-
-  @Query("SELECT p.status, COUNT(p), SUM(p.amount) FROM Payment p GROUP BY p.status")
-  List<Object[]> getPaymentStatistics();
-
-  @Query("SELECT p FROM Payment p WHERE p.clientId = :clientId ORDER BY p.createdAt DESC")
-  List<Payment> findPaymentsByClientIdWithPagination(@Param("clientId") Long clientId);
 
   @Query("SELECT p FROM Payment p WHERE p.status = :status AND p.createdAt < :dateTime")
   List<Payment> findStalePayments(@Param("status") PaymentStatus status, @Param("dateTime") LocalDateTime dateTime);
