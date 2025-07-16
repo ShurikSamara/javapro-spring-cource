@@ -11,7 +11,6 @@ import ru.learning.java.spring.repository.PaymentRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Сервис для аналитики платежей и отчётности
@@ -68,14 +67,6 @@ public class PaymentAnalyticsService {
     }
 
     /**
-     * Count payments by status
-     */
-    public long countPaymentsByStatus(PaymentStatus status) {
-        log.debug("Counting payments with status: {}", status);
-        return paymentRepository.countByStatus(status);
-    }
-
-    /**
      * Количество платежей конкретного клиента
      */
     public long countClientPayments(Long clientId) {
@@ -89,14 +80,6 @@ public class PaymentAnalyticsService {
     public boolean hasClientPaidForProduct(Long clientId, Long productId) {
         log.debug("Checking if client {} has paid for product {}", clientId, productId);
         return paymentRepository.existsByClientIdAndProductId(clientId, productId);
-    }
-
-    /**
-     * Последний платёж клиента
-     */
-    public Optional<Payment> getLastClientPayment(Long clientId) {
-        log.debug("Fetching last payment for client {}", clientId);
-        return paymentRepository.findTopByClientIdOrderByCreatedAtDesc(clientId);
     }
 
     /**

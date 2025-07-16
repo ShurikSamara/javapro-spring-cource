@@ -10,7 +10,6 @@ import ru.learning.java.spring.model.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
@@ -27,13 +26,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   List<Payment> findByAmountBetween(BigDecimal minAmount, BigDecimal maxAmount);
 
-  long countByStatus(PaymentStatus status);
-
   long countByClientId(Long clientId);
 
   boolean existsByClientIdAndProductId(Long clientId, Long productId);
-
-  Optional<Payment> findTopByClientIdOrderByCreatedAtDesc(Long clientId);
 
   @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.clientId = :clientId AND p.status = :status")
   BigDecimal getTotalAmountByClientIdAndStatus(@Param("clientId") Long clientId, @Param("status") PaymentStatus status);
