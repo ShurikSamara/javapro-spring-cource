@@ -1,0 +1,154 @@
+package ru.learning.java.spring.exception;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import ru.learning.java.spring.dto.ErrorResponse;
+
+import jakarta.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Обработчик исключений
+ */
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * NoResourceFoundException
+     *
+     * @return the error response
+     */
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound() {
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * IllegalArgumentException
+     *
+     * @param ex      the exception
+     * @param request the web request
+     * @return the error response
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        log.error("Invalid argument: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+          HttpStatus.BAD_REQUEST.value(),
+          ex.getMessage(),
+          request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * IllegalStateException
+     *
+     * @param ex      the exception
+     * @param request the web request
+     * @return the error response
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
+        log.error("Invalid state: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+          HttpStatus.CONFLICT.value(),
+          ex.getMessage(),
+          request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    /**
+     * MethodArgumentNotValidException
+     *
+     * @param ex      the exception
+     * @param request the web request
+     * @return the error response
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+      MethodArgumentNotValidException ex, WebRequest request) {
+        log.error("Validation error: {}", ex.getMessage(), ex);
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        String errorMessage = errors.entrySet().stream()
+          .map(entry -> entry.getKey() + ": " + entry.getValue())
+          .collect(Collectors.joining(", "));
+
+        ErrorResponse errorResponse = new ErrorResponse(
+          HttpStatus.BAD_REQUEST.value(),
+          "Validation error: " + errorMessage,
+          request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * Handle ConstraintViolationException
+     *
+     * @param ex      the exception
+     * @param request the web request
+     * @return the error response
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+      ConstraintViolationException ex, WebRequest request) {
+        log.error("Validation error: {}", ex.getMessage(), ex);
+
+        String errorMessage = ex.getConstraintViolations().stream()
+          .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+          .collect(Collectors.joining(", "));
+
+        ErrorResponse errorResponse = new ErrorResponse(
+          HttpStatus.BAD_REQUEST.value(),
+          "Validation error: " + errorMessage,
+          request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * Handle all other exceptions
+     *
+     * @param ex      the exception
+     * @param request the web request
+     * @return the error response
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+          HttpStatus.INTERNAL_SERVER_ERROR.value(),
+          "An unexpected error occurred: " + ex.getMessage(),
+          request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+}
