@@ -21,6 +21,7 @@ public class GlobalProductExceptionHandler {
   private static final Logger logger = LoggerFactory.getLogger(GlobalProductExceptionHandler.class);
 
   @ExceptionHandler(BaseProductException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleApiException(BaseProductException e, WebRequest request) {
     logger.warn("API Exception: {} - {}", e.getErrorType(), e.getMessage());
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);

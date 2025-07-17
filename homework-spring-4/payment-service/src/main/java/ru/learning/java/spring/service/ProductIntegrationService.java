@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Service
-public class ProductClientService {
-  private static final Logger log = LoggerFactory.getLogger(ProductClientService.class);
+public class ProductIntegrationService {
+  private static final Logger log = LoggerFactory.getLogger(ProductIntegrationService.class);
   private final RestTemplate restTemplate;
   private final String productServiceUrl;
 
-  public ProductClientService(RestTemplate restTemplate, String productServiceUrl) {
+  public ProductIntegrationService(RestTemplate restTemplate, String productServiceUrl) {
     this.restTemplate = restTemplate;
     this.productServiceUrl = productServiceUrl;
   }
@@ -64,10 +64,9 @@ public class ProductClientService {
       } else {
         throw new ProductServiceException("Unexpected response status: " + response.getStatusCode());
       }
-
-    } catch (HttpClientErrorException.NotFound e) {
-      log.warn("Resource not found: {}", url);
-      throw new ProductNotFoundException("Resource not found: " + url);
+    } catch (ProductNotFoundException | ProductServiceException e) {
+      log.warn("Product service error for URL {}: {}", url, e.getMessage());
+      throw e;
     } catch (ResourceAccessException e) {
       log.error("Network error while connecting to: {}", url, e);
       throw new ProductServiceException("Unable to connect to product service", e);

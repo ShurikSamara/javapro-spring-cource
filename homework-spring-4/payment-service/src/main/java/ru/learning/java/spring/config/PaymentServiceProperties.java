@@ -8,25 +8,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "payment-service")
 public class PaymentServiceProperties {
 
-  /**
-   * Максимальное количество неудавшихся платежей, разрешенное за 24 часа
-   */
-  private int maxFailedPayments = 5;
+  private int maxFailedPayments;
 
-  /**
-   * Тайм-аут в миллисекундах для подключения к внешним сервисам
-   */
-  private int connectionTimeout = 5000;
+  private int connectionTimeout;
 
-  /**
-   * Тайм-аут в миллисекундах для чтения из внешних служб
-   */
-  private int readTimeout = 5000;
+  private int readTimeout;
 
-  /**
-   * Хост для product-service
-   */
-  private String paymentServiceUrl = "http://localhost:8081";
+  private String productServiceUrl;
 
   public int getMaxFailedPayments() {
     return maxFailedPayments;
@@ -52,11 +40,11 @@ public class PaymentServiceProperties {
     this.readTimeout = readTimeout;
   }
 
-  public String getPaymentServiceUrl() {
-    return paymentServiceUrl;
+  public String getProductServiceUrl() {
+    return productServiceUrl;
   }
 
-  public void setPaymentServiceUrl(String paymentServiceUrl) {
-    this.paymentServiceUrl = paymentServiceUrl;
+  public void setProductServiceUrl(String productServiceUrl) {
+    this.productServiceUrl = productServiceUrl;
   }
 }

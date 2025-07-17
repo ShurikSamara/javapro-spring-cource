@@ -2,6 +2,7 @@ package ru.learning.java.spring.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,42 +12,40 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-/**
- * Вынесена конфигурация bean'oв в отдельный класс
- */
 @Configuration
-public class HttpClientConfig {
-  private static final Logger log = LoggerFactory.getLogger(HttpClientConfig.class);
+@EnableConfigurationProperties(PaymentServiceProperties.class)
+public class ProductIntegrationConfig {
+  private static final Logger log = LoggerFactory.getLogger(ProductIntegrationConfig.class);
 
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder, PaymentServiceProperties properties) {
-    log.info("Configuring RestTemplate with connection timeout: {}ms, read timeout: {}ms", properties.getConnectionTimeout(), properties.getReadTimeout());
+  public RestTemplate restTemplate(RestTemplateBuilder builder,
+                                   PaymentServiceProperties properties,
+                                   ProductServiceResponseErrorHandler errorHandler) {
+    log.info("Configuring RestTemplate with connection timeout: {}ms, read timeout: {}ms",
+      properties.getConnectionTimeout(), properties.getReadTimeout());
 
     SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
     requestFactory.setConnectTimeout(properties.getConnectionTimeout());
     requestFactory.setReadTimeout(properties.getReadTimeout());
 
-    return builder.requestFactory(() -> new BufferingClientHttpRequestFactory(requestFactory)).additionalInterceptors(loggingInterceptor()).errorHandler(new DefaultResponseErrorHandler() {
-      @Override
-      public void handleError(ClientHttpResponse response) throws IOException {
-        log.error("Error response received - Status: " + response.getStatusCode().value());
-        super.handleError(response);
-      }
-    }).build();
+    return builder.requestFactory(
+        () -> new BufferingClientHttpRequestFactory(requestFactory))
+      .additionalInterceptors(loggingInterceptor())
+      .errorHandler(errorHandler)
+      .build();
   }
+
 
   @Bean
   public String paymentServiceUrl(PaymentServiceProperties properties) {
-    return properties.getPaymentServiceUrl();
+    return properties.getProductServiceUrl();
   }
 
   private ClientHttpRequestInterceptor loggingInterceptor() {
@@ -62,7 +61,6 @@ public class HttpClientConfig {
         log.debug("Response status: {}", response.getStatusCode());
         log.trace("Response body: {}", responseBody);
       }
-
       return response;
     };
   }

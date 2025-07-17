@@ -2,7 +2,6 @@ package ru.learning.java.spring.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,16 +23,14 @@ public class HealthController {
    * Создадим health-check endpoint для удобства отслеживания живой ли сервис
    */
   @GetMapping
-  public ResponseEntity<HealthCheckResponse> healthCheck() {
+  public HealthCheckResponse healthCheck() {
     log.debug("Health check requested");
 
-    HealthCheckResponse healthInfo = new HealthCheckResponse(
+    return new HealthCheckResponse(
       "UP",
       LocalDateTime.now(),
       getUptime()
     );
-
-    return ResponseEntity.ok(healthInfo);
   }
 
   private String getUptime() {

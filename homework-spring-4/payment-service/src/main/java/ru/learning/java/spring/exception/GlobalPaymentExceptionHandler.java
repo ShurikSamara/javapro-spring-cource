@@ -17,6 +17,7 @@ public class GlobalPaymentExceptionHandler {
   private static final Logger logger = LoggerFactory.getLogger(GlobalPaymentExceptionHandler.class);
 
   @ExceptionHandler(BasePaymentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleApiException(BasePaymentException e, WebRequest request) {
     logger.warn("API Exception: {} - {}", e.getErrorType(), e.getMessage());
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
