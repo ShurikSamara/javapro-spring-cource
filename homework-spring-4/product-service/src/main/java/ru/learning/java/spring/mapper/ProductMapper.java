@@ -45,13 +45,4 @@ public class ProductMapper {
       .map(this::toDto)
       .collect(Collectors.toList());
   }
-
-  public List<Product> toEntityList(List<ProductDto> productDtos) {
-    if (productDtos == null) {
-      return null;
-    }
-    return productDtos.stream()
-      .map(this::toEntity)
-      .collect(Collectors.toList());
-  }
 }
