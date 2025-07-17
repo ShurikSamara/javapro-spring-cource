@@ -7,5 +7,5 @@ public record ProductDto(
   String accountNumber,
   BigDecimal balance,
   String productType,
-  Long userId
+  Long clientId
 ) {}

@@ -1,7 +1,5 @@
 package ru.learning.java.spring.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,8 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.learning.java.spring.dto.ProductDto;
+import ru.learning.java.spring.mapper.ProductMapper;
 import ru.learning.java.spring.model.Product;
 import ru.learning.java.spring.service.ProductService;
 
@@ -21,44 +20,48 @@ import java.util.List;
 public class ProductController {
 
   private final ProductService productService;
+  private final ProductMapper productMapper;
 
-  @Autowired
-  public ProductController(ProductService productService) {
+  public ProductController(ProductService productService, ProductMapper productMapper) {
     this.productService = productService;
+    this.productMapper = productMapper;
   }
 
   @GetMapping("/{id}")
-  public Product getProductById(@PathVariable("id") Long id) {
-    return productService.getProductById(id);
+  public ProductDto getProductById(@PathVariable Long id) {
+    Product product = productService.getProductById(id);
+    return productMapper.toDto(product);
   }
 
   @GetMapping("/client/{clientId}")
-  public List<Product> getProductsByClientId(@PathVariable("clientId") Long clientId) {
-    return productService.getProductsByClientId(clientId);
+  public List<ProductDto> getProductsByClientId(@PathVariable Long clientId) {
+    List<Product> products = productService.getProductsByClientId(clientId);
+    return productMapper.toDtoList(products);
   }
 
   @GetMapping
-  public List<Product> getAllProducts() {
-    return productService.getAllProducts();
+  public List<ProductDto> getAllProducts() {
+    List<Product> products = productService.getAllProducts();
+    return productMapper.toDtoList(products);
   }
 
   @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public Product createProduct(@RequestBody Product product) {
-    return productService.createProduct(product);
+  public ProductDto createProduct(@RequestBody ProductDto productDto) {
+    Product product = productMapper.toEntity(productDto);
+    Product savedProduct = productService.createProduct(product);
+    return productMapper.toDto(savedProduct);
   }
 
   @PutMapping("/{id}")
-  public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
-    if (product.getId() != null && !product.getId().equals(id)) {
-      throw new IllegalArgumentException("ID в пути и в теле запроса не совпадают");
-    }
-    return productService.updateProduct(id, product);
+  public ProductDto updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
+    Product product = productMapper.toEntity(productDto);
+    Product updatedProduct = productService.updateProduct(id, product);
+    return productMapper.toDto(updatedProduct);
   }
 
   @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteProduct(@PathVariable("id") Long id) {
+  public void deleteProduct(@PathVariable Long id) {
     productService.deleteProduct(id);
   }
+
 }

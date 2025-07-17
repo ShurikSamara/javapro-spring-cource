@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,13 +38,11 @@ public class HealthController {
 
   private String getUptime() {
     LocalDateTime now = LocalDateTime.now();
-    long seconds = java.time.Duration.between(startTime, now).getSeconds();
-    long days = seconds / (24 * 3600);
-    seconds = seconds % (24 * 3600);
-    long hours = seconds / 3600;
-    seconds = seconds % 3600;
-    long minutes = seconds / 60;
-    seconds = seconds % 60;
+    Duration duration = Duration.between(startTime, now);
+    long days = duration.toDays();
+    long hours = duration.toHours();
+    long minutes = duration.toMinutes();
+    long seconds = duration.toSeconds();
 
     return String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds);
   }
