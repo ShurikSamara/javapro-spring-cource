@@ -1,12 +1,10 @@
 package ru.learning.java.spring.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Конфиг для платёжного сервиса
  */
-@Configuration
 @ConfigurationProperties(prefix = "payment-service")
 public class PaymentServiceProperties {
 
