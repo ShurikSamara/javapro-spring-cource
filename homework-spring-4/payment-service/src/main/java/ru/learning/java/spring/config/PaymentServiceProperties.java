@@ -25,11 +25,6 @@ public class PaymentServiceProperties {
    */
   private int readTimeout = 5000;
 
-  /**
-   * Включать ли аналитику платежей
-   */
-  private boolean analyticsEnabled = true;
-
   public int getMaxFailedPayments() {
     return maxFailedPayments;
   }
@@ -54,11 +49,4 @@ public class PaymentServiceProperties {
     this.readTimeout = readTimeout;
   }
 
-  public boolean isAnalyticsEnabled() {
-    return analyticsEnabled;
-  }
-
-  public void setAnalyticsEnabled(boolean analyticsEnabled) {
-    this.analyticsEnabled = analyticsEnabled;
-  }
 }

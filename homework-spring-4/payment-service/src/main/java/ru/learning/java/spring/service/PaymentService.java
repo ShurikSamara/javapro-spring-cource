@@ -23,12 +23,10 @@ public class PaymentService {
 
   private final PaymentRepository paymentRepository;
   private final ProductServiceClient productServiceClient;
-  private final PaymentAnalyticsService analyticsService;
 
-  public PaymentService(PaymentRepository paymentRepository, ProductServiceClient productServiceClient, PaymentAnalyticsService analyticsService) {
+  public PaymentService(PaymentRepository paymentRepository, ProductServiceClient productServiceClient) {
     this.paymentRepository = paymentRepository;
     this.productServiceClient = productServiceClient;
-    this.analyticsService = analyticsService;
   }
 
   /**
@@ -52,11 +50,6 @@ public class PaymentService {
   @Transactional(rollbackFor = {PaymentProcessingException.class, RuntimeException.class})
   public PaymentResponse processPayment(PaymentRequest request) {
     log.debug("Processing payment for client ID: {}, product ID: {}", request.clientId(), request.productId());
-
-    if (!analyticsService.canClientMakePayment(request.clientId())) {
-      log.warn("Client {} has too many failed payments recently", request.clientId());
-      throw new PaymentProcessingException("Too many failed payment attempts. Please try again later.", null);
-    }
 
     ProductDto product = productServiceClient.getProductById(request.productId());
     log.debug("Retrieved product: {}", product);

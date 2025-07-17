@@ -130,7 +130,6 @@ public class GlobalPaymentExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 
-  // Вот так создать отчёт об ошибке
   private Map<String, Object> createErrorResponse(HttpStatus status, String error,
                                                   String message, WebRequest request) {
     Map<String, Object> errorResponse = new HashMap<>();

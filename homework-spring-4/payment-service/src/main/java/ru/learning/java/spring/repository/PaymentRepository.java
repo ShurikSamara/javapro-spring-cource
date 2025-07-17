@@ -15,27 +15,4 @@ import java.util.List;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   List<Payment> findByClientId(Long clientId);
-
-  List<Payment> findByStatus(PaymentStatus status);
-
-  List<Payment> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
-
-  List<Payment> findByClientIdAndCreatedAtBetween(Long clientId, LocalDateTime startDate, LocalDateTime endDate);
-
-  List<Payment> findByAmountGreaterThan(BigDecimal amount);
-
-  List<Payment> findByAmountBetween(BigDecimal minAmount, BigDecimal maxAmount);
-
-  long countByClientId(Long clientId);
-
-  boolean existsByClientIdAndProductId(Long clientId, Long productId);
-
-  @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.clientId = :clientId AND p.status = :status")
-  BigDecimal getTotalAmountByClientIdAndStatus(@Param("clientId") Long clientId, @Param("status") PaymentStatus status);
-
-  @Query("SELECT p FROM Payment p WHERE p.status = :status AND p.createdAt < :dateTime")
-  List<Payment> findStalePayments(@Param("status") PaymentStatus status, @Param("dateTime") LocalDateTime dateTime);
-
-  @Query("SELECT p FROM Payment p WHERE p.clientId = :clientId AND p.productId = :productId AND p.amount = :amount AND p.status != 'FAILED'")
-  List<Payment> findDuplicatePayments(@Param("clientId") Long clientId, @Param("productId") Long productId, @Param("amount") BigDecimal amount);
 }
