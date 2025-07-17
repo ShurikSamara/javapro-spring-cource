@@ -6,7 +6,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -30,29 +29,24 @@ public class HttpClientConfig {
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder, PaymentServiceProperties properties) {
-    log.info("Configuring RestTemplate with connection timeout: {}ms, read timeout: {}ms",
-      properties.getConnectionTimeout(), properties.getReadTimeout());
+    log.info("Configuring RestTemplate with connection timeout: {}ms, read timeout: {}ms", properties.getConnectionTimeout(), properties.getReadTimeout());
 
     SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
     requestFactory.setConnectTimeout(properties.getConnectionTimeout());
     requestFactory.setReadTimeout(properties.getReadTimeout());
 
-    return builder
-      .requestFactory(() -> new BufferingClientHttpRequestFactory(requestFactory))
-      .additionalInterceptors(loggingInterceptor())
-      .errorHandler(new DefaultResponseErrorHandler() {
-        @Override
-        public void handleError(ClientHttpResponse response) throws IOException {
-          log.error("Error response received - Status: " + response.getStatusCode().value());
-          super.handleError(response);
-        }
-      })
-      .build();
+    return builder.requestFactory(() -> new BufferingClientHttpRequestFactory(requestFactory)).additionalInterceptors(loggingInterceptor()).errorHandler(new DefaultResponseErrorHandler() {
+      @Override
+      public void handleError(ClientHttpResponse response) throws IOException {
+        log.error("Error response received - Status: " + response.getStatusCode().value());
+        super.handleError(response);
+      }
+    }).build();
   }
 
   @Bean
-  public String productServiceUrl(PaymentServiceProperties properties) {
-    return properties.getProductServiceUrl();
+  public String paymentServiceUrl(PaymentServiceProperties properties) {
+    return properties.getPaymentServiceUrl();
   }
 
   private ClientHttpRequestInterceptor loggingInterceptor() {

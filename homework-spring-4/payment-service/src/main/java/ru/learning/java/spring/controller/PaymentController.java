@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.learning.java.spring.dto.PaymentRequest;
 import ru.learning.java.spring.dto.PaymentResponse;
 import ru.learning.java.spring.dto.ProductDto;
-import ru.learning.java.spring.model.Payment;
 import ru.learning.java.spring.service.PaymentService;
 
 import java.util.List;
