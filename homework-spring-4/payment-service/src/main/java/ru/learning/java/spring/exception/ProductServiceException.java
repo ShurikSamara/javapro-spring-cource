@@ -1,7 +1,9 @@
 package ru.learning.java.spring.exception;
 
-public class ProductServiceException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ProductServiceException extends BaseApiException {
   public ProductServiceException(String message, Throwable cause) {
-    super(message, cause);
+    super(message, cause, HttpStatus.SERVICE_UNAVAILABLE, "Product Service Error");
   }
 }

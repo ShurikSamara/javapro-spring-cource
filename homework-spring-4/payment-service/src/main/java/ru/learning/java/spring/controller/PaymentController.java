@@ -37,7 +37,7 @@ public class PaymentController {
   }
 
   @GetMapping("/client/{clientId}")
-  public List<Payment> getClientPayments(@PathVariable Long clientId) {
+  public List<PaymentResponse> getClientPayments(@PathVariable Long clientId) {
     return paymentService.getClientPayments(clientId);
   }
 }

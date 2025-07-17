@@ -1,7 +1,9 @@
 package ru.learning.java.spring.exception;
 
-public class ProductAlreadyExistsException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ProductAlreadyExistsException extends BaseApiException {
   public ProductAlreadyExistsException(String message) {
-    super(message);
+    super(message, HttpStatus.CONFLICT, "Product Already Exists");
   }
 }

@@ -12,7 +12,6 @@ payment-service:
   max-failed-payments: 5
   connection-timeout: 5000
   read-timeout: 5000
-  analytics-enabled: true
 
 spring:
   # Profile-specific configuration

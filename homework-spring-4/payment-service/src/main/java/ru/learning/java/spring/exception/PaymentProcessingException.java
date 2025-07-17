@@ -1,7 +1,9 @@
 package ru.learning.java.spring.exception;
 
-public class PaymentProcessingException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class PaymentProcessingException extends BaseApiException {
   public PaymentProcessingException(String message, Throwable cause) {
-    super(message, cause);
+    super(message, cause, HttpStatus.INTERNAL_SERVER_ERROR, "Payment Processing Error");
   }
 }

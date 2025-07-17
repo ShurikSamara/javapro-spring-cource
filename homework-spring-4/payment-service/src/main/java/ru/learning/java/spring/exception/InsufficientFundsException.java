@@ -1,7 +1,9 @@
 package ru.learning.java.spring.exception;
 
-public class InsufficientFundsException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class InsufficientFundsException extends BaseApiException {
   public InsufficientFundsException(String message) {
-    super(message);
+    super(message, HttpStatus.BAD_REQUEST, "Insufficient Funds");
   }
 }

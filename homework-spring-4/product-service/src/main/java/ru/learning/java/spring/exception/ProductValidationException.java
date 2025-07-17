@@ -1,7 +1,9 @@
 package ru.learning.java.spring.exception;
 
-public class ProductValidationException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ProductValidationException extends BaseApiException {
   public ProductValidationException(String message) {
-    super(message);
+    super(message, HttpStatus.BAD_REQUEST, "Product Validation Error");
   }
 }

@@ -6,14 +6,17 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
@@ -24,7 +27,6 @@ import java.util.stream.Collectors;
 @Configuration
 public class HttpClientConfig {
   private static final Logger log = LoggerFactory.getLogger(HttpClientConfig.class);
-
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder, PaymentServiceProperties properties) {
@@ -38,7 +40,19 @@ public class HttpClientConfig {
     return builder
       .requestFactory(() -> new BufferingClientHttpRequestFactory(requestFactory))
       .additionalInterceptors(loggingInterceptor())
+      .errorHandler(new DefaultResponseErrorHandler() {
+        @Override
+        public void handleError(ClientHttpResponse response) throws IOException {
+          log.error("Error response received - Status: " + response.getStatusCode().value());
+          super.handleError(response);
+        }
+      })
       .build();
+  }
+
+  @Bean
+  public String productServiceUrl(PaymentServiceProperties properties) {
+    return properties.getProductServiceUrl();
   }
 
   private ClientHttpRequestInterceptor loggingInterceptor() {

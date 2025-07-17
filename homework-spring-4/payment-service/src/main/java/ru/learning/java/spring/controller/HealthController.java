@@ -6,11 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.learning.java.spring.dto.HealthCheckResponse;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Controller для health check endpoints
@@ -25,13 +24,14 @@ public class HealthController {
    * Создадим health-check endpoint для удобства отслеживания живой ли сервис
    */
   @GetMapping
-  public ResponseEntity<Map<String, Object>> healthCheck() {
+  public ResponseEntity<HealthCheckResponse> healthCheck() {
     log.debug("Health check requested");
 
-    Map<String, Object> healthInfo = new HashMap<>();
-    healthInfo.put("status", "UP");
-    healthInfo.put("timestamp", LocalDateTime.now());
-    healthInfo.put("uptime", getUptime());
+    HealthCheckResponse healthInfo = new HealthCheckResponse(
+      "UP",
+      LocalDateTime.now(),
+      getUptime()
+    );
 
     return ResponseEntity.ok(healthInfo);
   }

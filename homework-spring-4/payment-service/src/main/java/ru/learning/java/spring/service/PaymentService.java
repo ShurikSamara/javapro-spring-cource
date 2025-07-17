@@ -98,8 +98,27 @@ public class PaymentService {
    * @param clientId the client ID
    * @return list of payments
    */
-  public List<Payment> getClientPayments(Long clientId) {
+  public List<PaymentResponse> getClientPayments(Long clientId) {
     log.debug("Fetching payments for client ID: {}", clientId);
-    return paymentRepository.findByClientId(clientId);
+    List<Payment> payments = paymentRepository.findByClientId(clientId);
+
+    return payments.stream()
+      .map(this::convertToResponse)
+      .toList();
+  }
+
+  /**
+   * Преобразовать Payment entity в PaymentResponse для списка, чтобы Entity не вылетал в контроллер
+    */
+  private PaymentResponse convertToResponse(Payment payment) {
+    return new PaymentResponse(
+      payment.getId(),
+      payment.getStatus().name(),
+      payment.getAmount(),
+      null, // исключить message, но надо удалить
+      payment.getClientId(),
+      payment.getProductId(),
+      payment.getCreatedAt()
+    );
   }
 }

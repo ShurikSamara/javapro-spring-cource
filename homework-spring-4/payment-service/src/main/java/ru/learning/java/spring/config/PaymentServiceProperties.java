@@ -23,6 +23,11 @@ public class PaymentServiceProperties {
    */
   private int readTimeout = 5000;
 
+  /**
+   * Хост для product-service
+   */
+  private String productServiceUrl = "http://localhost:8081";
+
   public int getMaxFailedPayments() {
     return maxFailedPayments;
   }
@@ -47,4 +52,11 @@ public class PaymentServiceProperties {
     this.readTimeout = readTimeout;
   }
 
+  public String getProductServiceUrl() {
+    return productServiceUrl;
+  }
+
+  public void setProductServiceUrl(String productServiceUrl) {
+    this.productServiceUrl = productServiceUrl;
+  }
 }
