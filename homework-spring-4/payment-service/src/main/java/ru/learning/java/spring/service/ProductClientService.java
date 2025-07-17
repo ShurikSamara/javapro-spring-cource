@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Service
-public class ProductServiceClient {
-  private static final Logger log = LoggerFactory.getLogger(ProductServiceClient.class);
+public class ProductClientService {
+  private static final Logger log = LoggerFactory.getLogger(ProductClientService.class);
   private final RestTemplate restTemplate;
   private final String productServiceUrl;
 
-  public ProductServiceClient(RestTemplate restTemplate, String productServiceUrl) {
+  public ProductClientService(RestTemplate restTemplate, String productServiceUrl) {
     this.restTemplate = restTemplate;
     this.productServiceUrl = productServiceUrl;
   }

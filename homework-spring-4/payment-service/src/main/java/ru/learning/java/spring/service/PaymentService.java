@@ -22,11 +22,11 @@ public class PaymentService {
   private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 
   private final PaymentRepository paymentRepository;
-  private final ProductServiceClient productServiceClient;
+  private final ProductClientService productClientService;
 
-  public PaymentService(PaymentRepository paymentRepository, ProductServiceClient productServiceClient) {
+  public PaymentService(PaymentRepository paymentRepository, ProductClientService productClientService) {
     this.paymentRepository = paymentRepository;
-    this.productServiceClient = productServiceClient;
+    this.productClientService = productClientService;
   }
 
   /**
@@ -37,7 +37,7 @@ public class PaymentService {
    */
   public List<ProductDto> getClientProducts(Long clientId) {
     log.debug("Fetching products for client ID: {}", clientId);
-    return productServiceClient.getProductsByClientId(clientId);
+    return productClientService.getProductsByClientId(clientId);
   }
 
   /**
@@ -51,7 +51,7 @@ public class PaymentService {
   public PaymentResponse processPayment(PaymentRequest request) {
     log.debug("Processing payment for client ID: {}, product ID: {}", request.clientId(), request.productId());
 
-    ProductDto product = productServiceClient.getProductById(request.productId());
+    ProductDto product = productClientService.getProductById(request.productId());
     log.debug("Retrieved product: {}", product);
     
     if (request.amount() == null || request.amount().compareTo(BigDecimal.ZERO) <= 0) {

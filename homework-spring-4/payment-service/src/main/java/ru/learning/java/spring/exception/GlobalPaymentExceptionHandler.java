@@ -16,35 +16,12 @@ public class GlobalPaymentExceptionHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(GlobalPaymentExceptionHandler.class);
 
-  @ExceptionHandler(InsufficientFundsException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponse handleInsufficientFundsException(InsufficientFundsException e, WebRequest request) {
-    logger.warn("Недостаточно средств: {}", e.getMessage());
+  @ExceptionHandler(BasePaymentException.class)
+  public ErrorResponse handleApiException(BasePaymentException e, WebRequest request) {
+    logger.warn("API Exception: {} - {}", e.getErrorType(), e.getMessage());
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
   }
 
-  @ExceptionHandler({PaymentException.class, PaymentProcessingException.class})
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ErrorResponse handlePaymentException(BaseApiException e, WebRequest request) {
-    logger.error("Ошибка платежа: {}", e.getMessage());
-    return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
-  }
-
-  @ExceptionHandler({ProductNotFoundException.class})
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleProductNotFoundException(ProductNotFoundException e, WebRequest request) {
-    logger.warn("Продукт не найден: {}", e.getMessage());
-    return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
-  }
-
-  @ExceptionHandler(ProductServiceException.class)
-  @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-  public ErrorResponse handleProductServiceException(ProductServiceException e, WebRequest request) {
-    logger.error("Ошибка сервиса продуктов: {}", e.getMessage());
-    return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
-  }
-
-  // Обработка стандартных исключений
   @ExceptionHandler(IllegalArgumentException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleIllegalArgumentException(

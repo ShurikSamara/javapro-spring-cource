@@ -51,5 +51,3 @@ mvn spring-boot:run
 ### Платёжный сервис (порт 8082)
 - GET /api/v1/payments/client/{clientId}/products — получить все продукты клиента через платежный сервис
 - POST /api/v1/payments/process — обработать платеж
-
-### Не забудь убрать '/' в окончании пути, иначе ошибка

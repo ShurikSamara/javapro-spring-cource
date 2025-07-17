@@ -20,30 +20,29 @@ public class GlobalProductExceptionHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(GlobalProductExceptionHandler.class);
 
-  @ExceptionHandler(BaseApiException.class)
-  public ErrorResponse handleApiException(BaseApiException e, WebRequest request) {
+  @ExceptionHandler(BaseProductException.class)
+  public ErrorResponse handleApiException(BaseProductException e, WebRequest request) {
     logger.warn("API Exception: {} - {}", e.getErrorType(), e.getMessage());
-
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
   }
 
   @ExceptionHandler({ProductNotFoundException.class, ResourceNotFoundException.class})
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleNotFoundException(BaseApiException e, WebRequest request) {
+  public ErrorResponse handleNotFoundException(BaseProductException e, WebRequest request) {
     logger.warn("Resource not found: {}", e.getMessage());
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
   }
 
   @ExceptionHandler({ProductValidationException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponse handleValidationException(BaseApiException e, WebRequest request) {
+  public ErrorResponse handleValidationException(BaseProductException e, WebRequest request) {
     logger.warn("Validation error: {}", e.getMessage());
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
   }
 
   @ExceptionHandler({ProductAlreadyExistsException.class})
   @ResponseStatus(HttpStatus.CONFLICT)
-  public ErrorResponse handleConflictException(BaseApiException e, WebRequest request) {
+  public ErrorResponse handleConflictException(BaseProductException e, WebRequest request) {
     logger.warn("Conflict: {}", e.getMessage());
     return createErrorResponse(e.getHttpStatus(), e.getErrorType(), e.getMessage(), request);
   }
