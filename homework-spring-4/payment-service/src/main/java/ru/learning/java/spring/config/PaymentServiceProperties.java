@@ -1,6 +1,5 @@
 package ru.learning.java.spring.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,26 +13,22 @@ public class PaymentServiceProperties {
   /**
    * Максимальное количество неудавшихся платежей, разрешенное за 24 часа
    */
-  @Value("${payment-service.max-failed-payments}")
-  private int maxFailedPayments;
+  private int maxFailedPayments = 5;
 
   /**
    * Тайм-аут в миллисекундах для подключения к внешним сервисам
    */
-  @Value("${payment-service.connection-timeout}")
-  private int connectionTimeout;
+  private int connectionTimeout = 5000;
 
   /**
    * Тайм-аут в миллисекундах для чтения из внешних служб
    */
-  @Value("${payment-service.read-timeout}")
-  private int readTimeout;
+  private int readTimeout = 5000;
 
   /**
    * Включать ли аналитику платежей
    */
-  @Value("${payment-service.analytics-enabled}")
-  private boolean analyticsEnabled;
+  private boolean analyticsEnabled = true;
 
   public int getMaxFailedPayments() {
     return maxFailedPayments;
