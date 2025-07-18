@@ -35,11 +35,11 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ErrorResponse handleResourceNotFound(NoResourceFoundException ex, WebRequest request) {
     log.debug("Resource not found: {}", ex.getMessage());
-
+    String path = request.getDescription(false).replace("uri=", "");
     return new ErrorResponse(
       HttpStatus.NOT_FOUND.value(),
       "Resource not found: " + ex.getMessage(),
-      request.getDescription(false)
+      path
     );
   }
 

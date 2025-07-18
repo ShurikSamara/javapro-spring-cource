@@ -99,7 +99,10 @@ public class PaymentLimitServiceImpl implements PaymentLimitService {
     int updated = paymentLimitRepository.restoreLimit(request.userId(), request.amount(), now);
 
     if (updated == 0) {
-      throw new IllegalArgumentException("User not found: " + request.userId());
+      if (!paymentLimitRepository.existsByUserId(request.userId())) {
+        throw new IllegalArgumentException("User not found: " + request.userId());
+      }
+      throw new IllegalStateException("Failed to restore limit for user: " + request.userId());
     }
 
     PaymentLimit limit = paymentLimitRepository.findByUserId(request.userId())

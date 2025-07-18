@@ -66,7 +66,7 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
       "THEN pl.defaultLimit " +
       "ELSE pl.currentLimit + :amount END, " +
       "pl.lastUpdated = :lastUpdated " +
-      "WHERE pl.userId = :userId")
+      "WHERE pl.userId = :userId AND :amount > 0")
     int restoreLimit(@Param("userId") Long userId,
                      @Param("amount") BigDecimal amount,
                      @Param("lastUpdated") LocalDateTime lastUpdated);
