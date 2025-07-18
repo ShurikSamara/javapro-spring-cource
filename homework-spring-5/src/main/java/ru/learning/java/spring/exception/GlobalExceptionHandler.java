@@ -4,10 +4,10 @@ import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -32,16 +32,15 @@ public class GlobalExceptionHandler {
    * @return the error response
    */
   @ExceptionHandler(NoResourceFoundException.class)
-  public ResponseEntity<ErrorResponse> handleResourceNotFound(NoResourceFoundException ex, WebRequest request) {
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ErrorResponse handleResourceNotFound(NoResourceFoundException ex, WebRequest request) {
     log.debug("Resource not found: {}", ex.getMessage());
 
-    ErrorResponse errorResponse = new ErrorResponse(
+    return new ErrorResponse(
       HttpStatus.NOT_FOUND.value(),
       "Resource not found: " + ex.getMessage(),
       request.getDescription(false)
     );
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
 
   /**
@@ -52,16 +51,15 @@ public class GlobalExceptionHandler {
    * @return the error response
    */
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ErrorResponse handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
     log.error("Invalid argument: {}", ex.getMessage(), ex);
 
-    ErrorResponse errorResponse = new ErrorResponse(
+    return new ErrorResponse(
       HttpStatus.BAD_REQUEST.value(),
       ex.getMessage(),
       request.getDescription(false)
     );
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
   /**
@@ -72,16 +70,15 @@ public class GlobalExceptionHandler {
    * @return the error response
    */
   @ExceptionHandler(IllegalStateException.class)
-  public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ErrorResponse handleIllegalStateException(IllegalStateException ex, WebRequest request) {
     log.error("Invalid state: {}", ex.getMessage(), ex);
 
-    ErrorResponse errorResponse = new ErrorResponse(
+    return new ErrorResponse(
       HttpStatus.CONFLICT.value(),
       ex.getMessage(),
       request.getDescription(false)
     );
-
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
   }
 
   /**
@@ -92,7 +89,8 @@ public class GlobalExceptionHandler {
    * @return the error response
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ErrorResponse handleMethodArgumentNotValidException(
     MethodArgumentNotValidException ex, WebRequest request) {
     log.error("Validation error: {}", ex.getMessage(), ex);
 
@@ -111,13 +109,11 @@ public class GlobalExceptionHandler {
       .map(entry -> entry.getKey() + ": " + entry.getValue())
       .collect(Collectors.joining(", "));
 
-    ErrorResponse errorResponse = new ErrorResponse(
+    return new ErrorResponse(
       HttpStatus.BAD_REQUEST.value(),
       "Validation error: " + errorMessage,
       request.getDescription(false)
     );
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
   /**
@@ -128,7 +124,8 @@ public class GlobalExceptionHandler {
    * @return the error response
    */
   @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ErrorResponse handleConstraintViolationException(
     ConstraintViolationException ex, WebRequest request) {
     log.error("Validation error: {}", ex.getMessage(), ex);
 
@@ -136,13 +133,11 @@ public class GlobalExceptionHandler {
       .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
       .collect(Collectors.joining(", "));
 
-    ErrorResponse errorResponse = new ErrorResponse(
+    return new ErrorResponse(
       HttpStatus.BAD_REQUEST.value(),
       "Validation error: " + errorMessage,
       request.getDescription(false)
     );
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
   /**
@@ -153,15 +148,14 @@ public class GlobalExceptionHandler {
    * @return the error response
    */
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleAllExceptions(Exception ex, WebRequest request) {
     log.error("Unexpected error: {}", ex.getMessage(), ex);
 
-    ErrorResponse errorResponse = new ErrorResponse(
+    return new ErrorResponse(
       HttpStatus.INTERNAL_SERVER_ERROR.value(),
       "An unexpected error occurred: " + ex.getMessage(),
       request.getDescription(false)
     );
-
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 }

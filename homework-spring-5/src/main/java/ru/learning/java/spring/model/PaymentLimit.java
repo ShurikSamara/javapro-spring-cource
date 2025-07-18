@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,25 +17,15 @@ import java.util.Objects;
 public class PaymentLimit {
 
   @Id
-  @NotNull
   @Column(name = "user_id")
   private Long userId;
 
-  /**
-   * Кстати, с jakarta.validation удобно проверять значения,
-   * хотя может стоит отказаться от доп. зависимости с реализовать свои проверки.
-   */
-  @NotNull
-  @DecimalMin(value = "0.0", inclusive = true)
   @Column(name = "current_limit", nullable = false)
   private BigDecimal currentLimit;
 
-  @NotNull
-  @DecimalMin(value = "0.0", inclusive = true)
   @Column(name = "default_limit", nullable = false)
   private BigDecimal defaultLimit;
 
-  @NotNull
   @Column(name = "last_updated", nullable = false)
   private LocalDateTime lastUpdated;
 

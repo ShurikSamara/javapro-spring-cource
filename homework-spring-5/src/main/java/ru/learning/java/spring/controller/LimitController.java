@@ -1,5 +1,7 @@
 package ru.learning.java.spring.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -12,9 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.learning.java.spring.dto.LimitRequest;
 import ru.learning.java.spring.dto.LimitResponse;
 import ru.learning.java.spring.service.PaymentLimitService;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 /**
  * Контроллер для управления платёжными лимитами
