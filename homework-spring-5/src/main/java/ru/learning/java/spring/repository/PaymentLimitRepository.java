@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.learning.java.spring.model.PaymentLimit;
 
 import java.math.BigDecimal;
@@ -43,6 +44,7 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
      * @return количество обновлённых строк (1 - успех, 0 - недостаточно средств или пользователь не найден)
      */
     @Modifying
+    @Transactional
     @Query("UPDATE PaymentLimit pl SET pl.currentLimit = pl.currentLimit - :amount, pl.lastUpdated = :lastUpdated " +
       "WHERE pl.userId = :userId AND pl.currentLimit >= :amount")
     int decreaseLimit(@Param("userId") Long userId,
@@ -58,6 +60,7 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
      * @return количество обновлённых строк
      */
     @Modifying
+    @Transactional
     @Query("UPDATE PaymentLimit pl SET pl.currentLimit = " +
       "CASE WHEN pl.currentLimit + :amount > pl.defaultLimit " +
       "THEN pl.defaultLimit " +
@@ -75,6 +78,7 @@ public interface PaymentLimitRepository extends JpaRepository<PaymentLimit, Long
      * @return the number of rows affected
      */
     @Modifying
+    @Transactional
     @Query("UPDATE PaymentLimit pl SET pl.currentLimit = pl.defaultLimit, pl.lastUpdated = :lastUpdated")
     int resetAllLimits(@Param("lastUpdated") LocalDateTime lastUpdated);
 }
