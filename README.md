@@ -24,4 +24,5 @@
 - [💾Домашняя работа №1 Spring Context](./homework-spring-1)
 - [💾Домашняя работа №2 Spring Data JPA](./homework-spring-2)
 - [💾Домашняя работа №3 Spring Web](./homework-spring-3)
-- [🔧Домашняя работа №4 (в разработке до 08.07.25)](./homework-spring-4)
+- [🔧Домашняя работа №4 Spring Web (часть 2)(ревью задания)](./homework-spring-4)
+- [🔧Домашняя работа №5 Spring Web (часть 3)(в процессе разработки)](./homework-spring-5)

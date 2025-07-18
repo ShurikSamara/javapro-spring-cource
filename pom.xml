@@ -13,6 +13,7 @@
         <module>homework-spring-2</module>
         <module>homework-spring-3</module>
         <module>homework-spring-4</module>
+        <module>homework-spring-5</module>
     </modules>
 
     <properties>
