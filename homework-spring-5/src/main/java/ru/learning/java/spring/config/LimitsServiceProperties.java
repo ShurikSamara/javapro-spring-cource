@@ -11,10 +11,8 @@ import java.math.BigDecimal;
 @ConfigurationProperties(prefix = "limits-service")
 public class LimitsServiceProperties {
 
-  @Value("${limits-service.default-limit}")
   private BigDecimal defaultLimit;
 
-  @Value("${limits-service.reset-cron}")
   private String resetCron;
 
   public BigDecimal getDefaultLimit() {
